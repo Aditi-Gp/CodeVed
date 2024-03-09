@@ -34,7 +34,7 @@ function App() {
     };
 
     try {
-      const { data } = await axios.post('http://localhost:8000/run', payload);
+      const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL, payload);
       console.log(data);
       setOutput(data.output);
     } catch (error) {
