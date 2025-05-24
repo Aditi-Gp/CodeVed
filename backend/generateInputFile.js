@@ -8,6 +8,7 @@ if (!fs.existsSync(dirInputs)) {
     fs.mkdirSync(dirInputs, { recursive: true });
 }
 
+// Creates a temporary file with user's input data
 const generateInputFile = async (input) => {
     const jobID = uuid();
     const input_filename = `${jobID}.txt`;
