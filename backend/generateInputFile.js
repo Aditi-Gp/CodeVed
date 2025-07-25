@@ -1,6 +1,14 @@
-const fs = require('fs');
-const path = require('path');
-const { v4: uuid } = require('uuid');
+// generateInputFile.js (ESM version)
+
+import fs from 'fs';
+import path from 'path';
+import { v4 as uuid } from 'uuid';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// __dirname workaround in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const dirInputs = path.join(__dirname, 'inputs');
 
@@ -13,10 +21,8 @@ const generateInputFile = async (input) => {
     const jobID = uuid();
     const input_filename = `${jobID}.txt`;
     const input_filePath = path.join(dirInputs, input_filename);
-    await fs.writeFileSync(input_filePath, input);
+    await fs.promises.writeFile(input_filePath, input);
     return input_filePath;
 };
 
-module.exports = {
-    generateInputFile,
-};
+export { generateInputFile };

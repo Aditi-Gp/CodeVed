@@ -1,6 +1,12 @@
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
+// executeCpp.js
+import { exec, spawn } from "child_process";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Support for __dirname in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const outputPath = path.join(__dirname, "outputs");
 
@@ -8,28 +14,49 @@ if (!fs.existsSync(outputPath)) {
   fs.mkdirSync(outputPath, { recursive: true });
 }
 
-// Compiles and executes C++ code with given input
-const executeCpp = (filepath, inputPath) => {
-  const jobId = path.basename(filepath).split(".")[0];
-  const outPath = path.join(outputPath, `${jobId}.out`);
-
+const executeCpp = (filepath, inputPath, timeout = 5000) => {
   return new Promise((resolve, reject) => {
-    // Compile C++ file with g++ and then execute it with input
-    exec(
-      `g++ ${filepath} -o ${outPath} && cd ${outputPath} && ./${jobId}.out < ${inputPath}`,
-      (error, stdout, stderr) => {
-        if (error) {
-          reject({ error, stderr });
-        }
-        if (stderr) {
-          reject(stderr);
-        }
-        resolve(stdout);
+    const jobId = path.basename(filepath).split(".")[0];
+    const outPath = path.join(outputPath, `${jobId}.out`);
+
+    exec(`g++ "${filepath}" -o "${outPath}"`, (compileErr, _, compileStderr) => {
+      if (compileErr) {
+        return reject(new Error(compileStderr || compileErr.message || "Compilation failed"));
       }
-    );
+
+      const child = spawn(`./${jobId}.out`, {
+        cwd: outputPath,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+
+      const inputStream = fs.createReadStream(inputPath);
+      inputStream.pipe(child.stdin);
+
+      let stdout = "";
+      let stderr = "";
+
+      child.stdout.on("data", (data) => {
+        stdout += data.toString();
+      });
+
+      child.stderr.on("data", (data) => {
+        stderr += data.toString();
+      });
+
+      const timer = setTimeout(() => {
+        child.kill("SIGKILL");
+        return reject(new Error("Execution timed out"));
+      }, timeout);
+
+      child.on("close", (code) => {
+        clearTimeout(timer);
+        if (code !== 0) {
+          return reject(new Error(stderr || `Runtime error with exit code ${code}`));
+        }
+        return resolve(stdout || stderr);
+      });
+    });
   });
 };
 
-module.exports = {
-  executeCpp,
-};
+export { executeCpp };
