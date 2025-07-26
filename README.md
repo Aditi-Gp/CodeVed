@@ -2,7 +2,7 @@
 
 A modern, web-based C++ compiler and code execution platform built with React and Node.js. This application allows users to write, compile, and execute C++ code directly in their browser with real-time syntax highlighting and user input support.
 
-![AlgoU Online Compiler](https://github.com/bhavesh1129/AlgoU-Online-Compiler-2/blob/main/frontend/Snapshot.png)
+![CodeVed Online Judge](Screenshot from 2025-07-26 14-24-35.png)
 
 ## 🚀 Features
 
