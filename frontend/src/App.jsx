@@ -7,6 +7,7 @@ import ProblemList from './pages/ProblemList.jsx';
 import Editor from './Editor.jsx'; 
 import ProblemDetails from './pages/ProblemDetails.jsx';
 import Compiler from './pages/Compiler.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 
 import './App.css';
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/problems" element={<ProblemList />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/problems/:id" element={<ProblemDetails />} />
       </Routes>
     </Router>

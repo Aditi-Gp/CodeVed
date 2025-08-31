@@ -58,7 +58,7 @@ export default function LoginPage() {
       localStorage.setItem('token', res.data.token);
       setLoading(false);
       alert('Login successful');
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setLoading(false);
       console.error(err.response);

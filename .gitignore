@@ -1,3 +1,58 @@
 backend/.env
 frontend/.env
 server/.env
+# Node modules
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+.out/
+.next/
+.cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backend specific
+backend/inputs/
+backend/outputs/
+backend/codes/
+
+# Server specific
+server/models/__pycache__/
+server/uploads/
+server/tmp/
+
+# Frontend specific
+frontend/.vite/
+frontend/.DS_Store
+
+# Misc
+*.pid
+*.seed
+*.pid.lock
+

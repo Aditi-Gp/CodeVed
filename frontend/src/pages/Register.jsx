@@ -38,7 +38,7 @@ function AnimatedBackground() {
 }
 
 export default function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -77,13 +77,13 @@ export default function Register() {
       <div className="max-w-md w-full mx-auto p-8 bg-gray-800 rounded-lg shadow-md bg-opacity-95">
         <h2 className="text-3xl font-semibold mb-6 text-center">Register</h2>
         <form onSubmit={handleSubmit} noValidate>
-          <label htmlFor="name" className="block mb-2 font-medium">
-            Name
+          <label htmlFor="username" className="block mb-2 font-medium">
+            Username
             <input
-              id="name"
-              name="name"
+              id="username"
+              name="username"
               type="text"
-              placeholder="Your full name"
+              placeholder="Username"
               value={form.name}
               onChange={handleChange}
               required

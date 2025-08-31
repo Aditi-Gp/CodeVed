@@ -8,10 +8,10 @@ const router = express.Router();
 
 // Register
 router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   // Step 2: Check all data exists
-  if (!name || !email || !password) {
+  if (!username || !email || !password) {
     return res.status(400).json({ msg: 'Please fill in all fields' });
   }
 
@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
 
     // Step 5: Save user
-    const user = new User({ name, email, password: hashed });
+    const user = new User({ username, email, password: hashed });
     await user.save();
 
     // Step 6: Generate JWT token
@@ -35,7 +35,7 @@ router.post('/register', async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.name,
+        username: user.username,
         email: user.email
       }
     });
@@ -64,11 +64,21 @@ router.post('/login', async (req, res) => {
 
     res.json({ 
       token, 
-      user: { id: user._id, name: user.name, email: user.email } 
+      user: { id: user._id, username: user.username, email: user.email } 
     });
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });
   }
 });
+
+
+// routes/user.js
+router.get("/:id/progress", async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  res.json(user.progress);
+});
+
 
 export default router;
