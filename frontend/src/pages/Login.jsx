@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import * as THREE from 'three';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { setTokens } from '../utils/auth.js';
 
 // Animated background component
 function AnimatedBackground() {
@@ -53,16 +54,30 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', form);
-      localStorage.setItem('token', res.data.token);
-      setLoading(false);
-      alert('Login successful');
-      navigate('/dashboard');
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+      const res = await axios.post(`${backendUrl}/api/auth/login`, form);
+      
+      if (res.data.success && res.data.token) {
+        // Store tokens securely using utility
+        setTokens(res.data.token, res.data.refreshToken, res.data.user);
+        
+        setLoading(false);
+        navigate('/dashboard');
+      } else {
+        throw new Error(res.data.error || 'Login failed');
+      }
     } catch (err) {
       setLoading(false);
-      console.error(err.response);
-      setError(err.response?.data?.msg || 'Login failed');
+      const errorMsg = err.response?.data?.error || err.response?.data?.msg || err.message || 'Login failed';
+      setError(errorMsg);
+      
+      // Handle rate limiting
+      if (err.response?.status === 429) {
+        const retryAfter = err.response?.data?.retryAfter || 60;
+        setError(`${errorMsg} Please try again in ${retryAfter} seconds.`);
+      }
     }
   };
 

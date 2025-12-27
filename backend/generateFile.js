@@ -16,10 +16,29 @@ if (!fs.existsSync(dirCodes)) {
     fs.mkdirSync(dirCodes, { recursive: true });
 }
 
-// Creates a temporary file with user's code content
-const generateFile = async (format, content) => {
+/**
+ * Map language identifier to file extension
+ * Critical: Ensures correct file extensions for compilation/execution
+ */
+function getFileExtension(language) {
+    const extensionMap = {
+        cpp: 'cpp',
+        java: 'java',
+        python: 'py', // Python uses .py, not .python
+    };
+    return extensionMap[language.toLowerCase()] || language.toLowerCase();
+}
+
+/**
+ * Creates a temporary file with user's code content
+ * @param {string} language - Language identifier (cpp, java, python)
+ * @param {string} content - Code content
+ * @returns {Promise<string>} Path to the generated file
+ */
+const generateFile = async (language, content) => {
     const jobID = uuid();
-    const filename = `${jobID}.${format}`;
+    const extension = getFileExtension(language);
+    const filename = `${jobID}.${extension}`;
     const filePath = path.join(dirCodes, filename);
     await fs.promises.writeFile(filePath, content);
     return filePath;

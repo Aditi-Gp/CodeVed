@@ -1,9 +1,23 @@
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
 backend/.env
 frontend/.env
 server/.env
+
 # Node modules
 node_modules/
 **/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
 
 # Build outputs
 dist/
@@ -11,48 +25,100 @@ build/
 .out/
 .next/
 .cache/
+*.tsbuildinfo
 
 # Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-logs/
-*.log
+lerna-debug.log*
 
-# Environment files
-.env
-.env.local
-.env.development
-.env.test
-.env.production
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.nyc_output/
 
 # IDE / Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
 
 # OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
 
-# Backend specific
+# Backend specific - temporary execution files
 backend/inputs/
 backend/outputs/
 backend/codes/
+backend/*.class
+backend/*.out
+backend/*.exe
 
 # Server specific
 server/models/__pycache__/
 server/uploads/
 server/tmp/
+server/*.pyc
+server/__pycache__/
 
 # Frontend specific
 frontend/.vite/
 frontend/.DS_Store
+frontend/dist/
+frontend/build/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+*.dockerfile.local
+
+# AWS
+.aws/
+*.pem
+*.key
+.ebextensions/
+.elasticbeanstalk/
+
+# Deployment
+deploy/
+*.tar.gz
+*.zip
+.env.production
+
+# Testing
+.coverage
+.nyc_output/
+test-results/
+playwright-report/
 
 # Misc
 *.pid
 *.seed
 *.pid.lock
+.cache
+.temp
+.tmp
 

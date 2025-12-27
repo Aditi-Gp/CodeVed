@@ -1,21 +1,88 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../utils/axiosConfig.js";
+import { useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-
+import { getCurrentUser, clearAuth } from "../utils/auth.js";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
   const [progress, setProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const user = getCurrentUser();
 
   useEffect(() => {
-    axios.get(`/api/user/${localStorage.getItem("userId")}/progress`)
-      .then(res => setProgress(res.data))
-      .catch(err => console.error(err));
-  }, []);
+    const fetchProgress = async () => {
+      if (!user?.id) {
+        setError('User not found');
+        setLoading(false);
+        return;
+      }
 
-  if (!progress) return <div>Loading...</div>;
+      try {
+        const response = await api.get(`/api/auth/${user.id}/progress`);
+
+        if (response.data.success) {
+          setProgress(response.data.progress);
+        } else {
+          throw new Error(response.data.error || 'Failed to fetch progress');
+        }
+      } catch (err) {
+        console.error('Progress fetch error:', err);
+        
+        // Handle authentication errors
+        if (err.response?.status === 401) {
+          clearAuth();
+          navigate('/login');
+          return;
+        }
+
+        setError(err.response?.data?.error || err.message || 'Failed to load progress');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProgress();
+  }, [user, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!progress) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
+        <p>No progress data available</p>
+      </div>
+    );
+  }
 
   const topicData = Object.entries(progress.topicWise).map(([key, value]) => ({
     name: key, solved: value

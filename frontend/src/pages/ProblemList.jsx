@@ -8,7 +8,7 @@ export default function ProblemList() {
   useEffect(() => {
     async function fetchProblems() {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/problems');
+        const { data } = await axios.get('${import.meta.env.VITE_BACKEND_URL}/api/problems');
         setProblems(data);
       } catch (err) {
         console.error('Failed to load problems:', err);
@@ -19,7 +19,7 @@ export default function ProblemList() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
-      <h1 className="text-3xl font-bold mb-6 text-indigo-400">📘 Problem List</h1>
+      <h1 className="text-3xl font-bold mb-6 text-indigo-400">Problem List</h1>
 
       <div className="grid gap-4">
         {problems.length === 0 ? (

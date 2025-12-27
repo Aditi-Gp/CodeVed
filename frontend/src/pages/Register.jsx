@@ -50,15 +50,36 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
+
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', form);
-      setLoading(false);
-      alert(res.data.msg);
-      navigate('/login');
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+      const res = await axios.post(`${backendUrl}/api/auth/register`, form);
+      
+      if (res.data.success) {
+        setLoading(false);
+        // Store tokens if provided
+        if (res.data.token) {
+          localStorage.setItem('token', res.data.token);
+        }
+        if (res.data.refreshToken) {
+          localStorage.setItem('refreshToken', res.data.refreshToken);
+        }
+        navigate('/login');
+      } else {
+        throw new Error(res.data.error || 'Registration failed');
+      }
     } catch (err) {
       setLoading(false);
-      setError(err.response?.data?.msg || 'Registration failed');
+      const errorMsg = err.response?.data?.error || err.response?.data?.msg || err.message || 'Registration failed';
+      setError(errorMsg);
+      
+      // Handle rate limiting
+      if (err.response?.status === 429) {
+        const retryAfter = err.response?.data?.retryAfter || 60;
+        setError(`${errorMsg} Please try again in ${retryAfter} seconds.`);
+      }
     }
   };
 
@@ -84,7 +105,7 @@ export default function Register() {
               name="username"
               type="text"
               placeholder="Username"
-              value={form.name}
+              value={form.username}
               onChange={handleChange}
               required
               className="w-full mt-1 p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400"

@@ -8,6 +8,8 @@ import Editor from './Editor.jsx';
 import ProblemDetails from './pages/ProblemDetails.jsx';
 import Compiler from './pages/Compiler.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import { isAuthenticated } from './utils/auth.js';
 
 import './App.css';
 
@@ -19,14 +21,30 @@ function App() {
         <Route path="/compiler" element={<Compiler />} />
         <Route path="/editor" element={<Editor />} />
         <Route path="/problems" element={<ProblemList />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route 
+          path="/login" 
+          element={
+            isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Register />
+          } 
+        />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/problems/:id" element={<ProblemDetails />} />
       </Routes>
     </Router>
   );
 }
-
 
 export default App;
