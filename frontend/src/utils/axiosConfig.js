@@ -5,12 +5,11 @@
 
 import axios from 'axios';
 import { getToken, getAuthHeader, refreshAccessToken, clearAuth } from './auth.js';
+import { API_SERVER_URL } from './apiConfig.js';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-
-// Create axios instance
+// Create axios instance for API server (port 5000)
 const api = axios.create({
-  baseURL: backendUrl,
+  baseURL: API_SERVER_URL,
   timeout: 30000, // 30 second timeout
 });
 

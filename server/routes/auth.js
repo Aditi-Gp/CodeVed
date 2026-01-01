@@ -255,6 +255,8 @@ router.post('/refresh', async (req, res) => {
  * Allows frontend to check if token is still valid
  */
 router.get('/verify', authenticate, async (req, res) => {
+  const requestId = req.id || 'unknown';
+  logger.info('Token verification attempt', { requestId });
   res.json({ 
     success: true,
     user: {

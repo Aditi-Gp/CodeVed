@@ -3,7 +3,9 @@
  * Handles token storage, validation, and refresh
  */
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+import { API_SERVER_URL } from './apiConfig.js';
+
+const BACKEND_URL = API_SERVER_URL;
 
 /**
  * Get stored token
@@ -115,7 +117,13 @@ export const verifyToken = async () => {
     });
 
     const data = await response.json();
+    if (data.success !== true) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return false;
+    }    
     return data.success === true;
+    
   } catch (error) {
     console.error('Token verification failed:', error);
     return false;

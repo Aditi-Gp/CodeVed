@@ -78,3 +78,7 @@ echo "1. Update ECS task definitions with new image URIs"
 echo "2. Update ECS services to use new task definitions"
 echo "3. Or use AWS CodePipeline/CodeDeploy for automated deployment"
 
+
+
+
+

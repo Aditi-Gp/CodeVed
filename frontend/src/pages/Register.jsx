@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../utils/axiosConfig.js';
 import { useNavigate } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
 
@@ -54,8 +54,8 @@ export default function Register() {
     setError('');
 
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-      const res = await axios.post(`${backendUrl}/api/auth/register`, form);
+      console.log('Attempting registration...');
+      const res = await api.post('/api/auth/register', form);
       
       if (res.data.success) {
         setLoading(false);
@@ -71,8 +71,21 @@ export default function Register() {
         throw new Error(res.data.error || 'Registration failed');
       }
     } catch (err) {
+      console.error('Registration error:', err);
       setLoading(false);
-      const errorMsg = err.response?.data?.error || err.response?.data?.msg || err.message || 'Registration failed';
+      
+      let errorMsg = 'Registration failed';
+      
+      if (err.code === 'ECONNREFUSED') {
+        errorMsg = 'Cannot connect to server. Please ensure the server is running on port 5000.';
+      } else if (err.response?.data?.error) {
+        errorMsg = err.response.data.error;
+      } else if (err.response?.data?.msg) {
+        errorMsg = err.response.data.msg;
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
       setError(errorMsg);
       
       // Handle rate limiting

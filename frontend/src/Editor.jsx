@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from './utils/axiosConfig.js';
+import executionApi from './utils/executionApi.js';
 import './App.css';
 import CodeBlock from './CodeBlock';
 import { codeTemplates, getLanguageName, getPrismLanguage } from './utils/codeTemplates.js';
@@ -17,11 +18,11 @@ function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [supportedLanguages, setSupportedLanguages] = useState(['cpp', 'java', 'python']);
 
-  // Fetch supported languages from backend on mount
+  // Fetch supported languages from execution backend on mount
   useEffect(() => {
     const fetchLanguages = async () => {
       try {
-        const response = await api.get('/languages');
+        const response = await executionApi.get('/languages');
         if (response.data.success) {
           setSupportedLanguages(response.data.languages);
         }
@@ -58,7 +59,7 @@ function App() {
 
     try {
       const startTime = Date.now();
-      const { data } = await api.post('/run', payload);
+      const { data } = await executionApi.post('/run', payload);
       const duration = Date.now() - startTime;
       
       if (data.success) {

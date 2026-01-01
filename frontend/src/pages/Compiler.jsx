@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import executionApi from '../utils/executionApi.js';
+import { API_SERVER_URL } from '../utils/apiConfig.js';
 import CodeBlock from '../CodeBlock';
 import { codeTemplates, getLanguageName, getPrismLanguage } from '../utils/codeTemplates.js';
 
@@ -15,13 +16,13 @@ export default function Compiler() {
   useEffect(() => {
     const fetchLanguages = async () => {
       try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        const response = await axios.get(`${backendUrl}/languages`);
+        const response = await executionApi.get('/languages');
         if (response.data.success) {
           setSupportedLanguages(response.data.languages);
         }
       } catch (err) {
-        console.warn('Failed to fetch supported languages');
+        console.warn('Failed to fetch supported languages:', err);
+        // Keep default languages if fetch fails
       }
     };
     fetchLanguages();
@@ -42,8 +43,8 @@ export default function Compiler() {
     setError(null);
 
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL;
-      const { data } = await axios.post(`${backendUrl}/run`, { language, code, input });
+      console.log('Sending execution request to:', executionApi.defaults.baseURL);
+      const { data } = await executionApi.post('/run', { language, code, input });
       
       if (data.success) {
         setOutput(data.output || '');
@@ -52,7 +53,17 @@ export default function Compiler() {
         setOutput('');
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.error || err.message || 'Error running code';
+      console.error('Execution error:', err);
+      let errorMsg = 'Error running code';
+      
+      if (err.code === 'ECONNREFUSED') {
+        errorMsg = 'Cannot connect to execution service. Please ensure the backend is running on port 8000.';
+      } else if (err.response?.data?.error) {
+        errorMsg = err.response.data.error;
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
       setError(errorMsg);
       setOutput('');
     } finally {

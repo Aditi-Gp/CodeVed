@@ -16,6 +16,13 @@ export default function ProtectedRoute({ children }) {
   useEffect(() => {
     const validateAuth = async () => {
       // Check if token exists
+
+      if (location.pathname === '/login' || location.pathname === '/register') {
+        setIsValidating(false);
+        setIsAuthorized(false);
+        return;
+      }
+      
       if (!isAuthenticated()) {
         setIsAuthorized(false);
         setIsValidating(false);
@@ -42,7 +49,7 @@ export default function ProtectedRoute({ children }) {
     };
 
     validateAuth();
-  }, [location.pathname]);
+  }, []);
 
   if (isValidating) {
     return (
@@ -62,4 +69,8 @@ export default function ProtectedRoute({ children }) {
 
   return children;
 }
+
+
+
+
 

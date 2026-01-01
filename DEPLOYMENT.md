@@ -1,6 +1,6 @@
 # AWS Deployment Guide
 
-This guide covers deploying the AlgoU Online Compiler to AWS using ECS Fargate.
+This guide covers deploying the CodeVed Online Compiler to AWS using ECS Fargate.
 
 ## Prerequisites
 
@@ -195,4 +195,8 @@ Deploy MongoDB on EC2 or use MongoDB Atlas.
 5. Use HTTPS/TLS everywhere
 6. Regular security audits
 7. Enable ECR image scanning
+
+
+
+
 

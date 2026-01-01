@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../utils/axiosConfig.js';
+import executionApi from '../utils/executionApi.js';
 import CodeBlock from '../CodeBlock';
 import { codeTemplates, getLanguageName, getPrismLanguage } from '../utils/codeTemplates.js';
 
@@ -19,15 +20,15 @@ export default function ProblemDetails() {
   useEffect(() => {
     api.get(`/api/problems/${id}`).then(res => setProblem(res.data));
     
-    // Fetch supported languages
+    // Fetch supported languages from execution backend
     const fetchLanguages = async () => {
       try {
-        const response = await api.get('/languages');
+        const response = await executionApi.get('/languages');
         if (response.data.success) {
           setSupportedLanguages(response.data.languages);
         }
       } catch (err) {
-        console.warn('Failed to fetch supported languages');
+        console.warn('Failed to fetch supported languages, using defaults');
       }
     };
     fetchLanguages();
@@ -172,6 +173,7 @@ export default function ProblemDetails() {
       >
         {loadingExplain ? 'Generating...' : 'Explain Code'}
       </button>
+      </div>
 
 
       {verdict && (
@@ -197,3 +199,4 @@ export default function ProblemDetails() {
     </div>
   );
 }
+

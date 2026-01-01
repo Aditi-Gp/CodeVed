@@ -1,7 +1,7 @@
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import * as THREE from 'three';
-import axios from 'axios';
+import api from '../utils/axiosConfig.js';
 import { useNavigate } from 'react-router-dom';
 import { setTokens } from '../utils/auth.js';
 
@@ -56,8 +56,8 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-      const res = await axios.post(`${backendUrl}/api/auth/login`, form);
+      console.log('Attempting login...');
+      const res = await api.post('/api/auth/login', form);
       
       if (res.data.success && res.data.token) {
         // Store tokens securely using utility
@@ -69,8 +69,21 @@ export default function LoginPage() {
         throw new Error(res.data.error || 'Login failed');
       }
     } catch (err) {
+      console.error('Login error:', err);
       setLoading(false);
-      const errorMsg = err.response?.data?.error || err.response?.data?.msg || err.message || 'Login failed';
+      
+      let errorMsg = 'Login failed';
+      
+      if (err.code === 'ECONNREFUSED') {
+        errorMsg = 'Cannot connect to server. Please ensure the server is running on port 5000.';
+      } else if (err.response?.data?.error) {
+        errorMsg = err.response.data.error;
+      } else if (err.response?.data?.msg) {
+        errorMsg = err.response.data.msg;
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
       setError(errorMsg);
       
       // Handle rate limiting

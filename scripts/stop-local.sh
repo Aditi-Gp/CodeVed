@@ -35,3 +35,7 @@ pkill -f "vite" 2>/dev/null || true
 
 echo -e "\n${GREEN}=== All Services Stopped ===${NC}"
 
+
+
+
+

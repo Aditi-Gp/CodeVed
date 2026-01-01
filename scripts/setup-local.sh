@@ -9,7 +9,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${GREEN}=== AlgoU Online Compiler - Local Setup ===${NC}\n"
+echo -e "${GREEN}=== CodeVed Online Compiler - Local Setup ===${NC}\n"
 
 # Check Node.js
 if ! command -v node &> /dev/null; then
@@ -123,7 +123,8 @@ if [ ! -f "server/.env" ]; then
 fi
 
 if [ ! -f "frontend/.env" ]; then
-    echo "VITE_BACKEND_URL=http://localhost:5000" > frontend/.env
+    echo "VITE_API_SERVER_URL=http://localhost:5000" > frontend/.env
+    echo "VITE_EXECUTION_BACKEND_URL=http://localhost:8000" >> frontend/.env
     echo -e "${GREEN}✓ Created frontend/.env${NC}"
 fi
 

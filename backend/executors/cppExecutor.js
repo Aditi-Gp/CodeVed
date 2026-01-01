@@ -141,7 +141,7 @@ export class CppExecutor extends BaseExecutor {
       // Cleanup
       await this.cleanup(filesToCleanup);
 
-      return result.stdout || result.stderr;
+      return stdout || stderr;
     } catch (error) {
       const duration = Date.now() - startTime;
       logger.runtimeError(requestId, "cpp", jobId, error, duration);

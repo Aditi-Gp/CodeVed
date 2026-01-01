@@ -51,10 +51,10 @@ export class JavaExecutor extends BaseExecutor {
 
     return new Promise((resolve, reject) => {
       exec(
-        `javac -d "${this.classPath}" "${filePath}"`,
-        { 
+        `javac "${filePath}"`,
+        {
           timeout: this.config.compilationTimeout,
-          cwd: this.classPath,
+          cwd: path.dirname(filePath),
         },
         (error, stdout, stderr) => {
           const duration = Date.now() - compileStart;
@@ -89,11 +89,23 @@ export class JavaExecutor extends BaseExecutor {
       const code = await fs.promises.readFile(filePath, "utf-8");
       className = this.extractClassName(code);
 
+      // Java REQUIRES filename == public class name
+      const jobDir = path.join(this.classPath, jobId);
+      await fs.promises.mkdir(jobDir, { recursive: true });
+
+      const javaFilePath = path.join(jobDir, `${className}.java`);
+      await fs.promises.writeFile(javaFilePath, code);
+
+      // Override filePath for compilation
+      filePath = javaFilePath;
+
+
       logger.compilationStart(requestId, "java", jobId);
       await this.compile(filePath, jobId);
 
       // Find compiled .class file
-      const classFile = path.join(this.classPath, `${className}.class`);
+      const classFile = path.join(jobDir, `${className}.class`);
+
       if (!fs.existsSync(classFile)) {
         throw new Error(`Compiled class file not found: ${className}.class`);
       }
@@ -109,9 +121,11 @@ export class JavaExecutor extends BaseExecutor {
       const hasPolicyFile = fs.existsSync(policyPath);
       
       const javaArgs = [
-        `-Xmx${memoryLimitMB}m`, // Memory limit
-        `-Xms64m`, // Initial heap size
-        `-XX:MaxMetaspaceSize=64m`, // Limit metaspace
+        "-cp", jobDir,
+        `-Xmx${memoryLimitMB}m`,
+        "-Xms64m",
+        "-XX:MaxMetaspaceSize=64m",
+        className
       ];
       
       // Add security manager only if policy file exists
@@ -123,13 +137,14 @@ export class JavaExecutor extends BaseExecutor {
       javaArgs.push(className);
       
       const child = spawn("java", javaArgs, {
-        cwd: this.classPath,
+        cwd: path.dirname(filePath),
         stdio: ["pipe", "pipe", "pipe"],
         env: {
           ...process.env,
           JAVA_HOME: process.env.JAVA_HOME || "/usr/lib/jvm/default-java",
         },
-      });
+      });   
+
 
       // Pipe input if provided
       if (inputPath && fs.existsSync(inputPath)) {

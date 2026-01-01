@@ -61,3 +61,7 @@ echo -e "  - Frontend: http://localhost:5173"
 echo -e "\nLogs are in the logs/ directory"
 echo -e "To stop all services: ./scripts/stop-local.sh"
 
+
+
+
+
