@@ -5,6 +5,8 @@
 
 import express from 'express';
 import Problem from '../models/Problem.js';
+import User from '../models/User.js';
+import Submission from '../models/Submission.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -155,6 +157,57 @@ router.post('/:id', authenticate, async (req, res) => {
 
     const passedAll = results.every(r => r.passed);
     const verdict = passedAll ? 'Accepted' : 'Wrong Answer';
+    const status = passedAll ? 'success' : 'failed';
+
+    // Update user progress
+    try {
+      const user = await User.findById(userId);
+      if (user) {
+        user.progress.totalAttempted += 1;
+        if (passedAll) {
+          user.progress.totalSolved += 1;
+          
+          // Update topic-wise stats
+          if (problem.topics && Array.isArray(problem.topics)) {
+            problem.topics.forEach((topic) => {
+              if (user.progress.topicWise[topic] !== undefined) {
+                user.progress.topicWise[topic] += 1;
+              }
+            });
+          }
+          
+          // Update difficulty stats
+          if (problem.difficulty && user.progress.difficultyWise[problem.difficulty] !== undefined) {
+            user.progress.difficultyWise[problem.difficulty] += 1;
+          }
+        }
+        await user.save();
+      }
+    } catch (progressErr) {
+      logger.warn('Failed to update user progress', { 
+        requestId, 
+        error: progressErr.message 
+      });
+    }
+
+    // Save submission to database
+    try {
+      const submission = new Submission({
+        userId,
+        problemId: id,
+        problemName: problem.name || 'Unknown Problem',
+        code,
+        language,
+        verdict,
+        status,
+      });
+      await submission.save();
+    } catch (submissionErr) {
+      logger.warn('Failed to save submission', { 
+        requestId, 
+        error: submissionErr.message 
+      });
+    }
 
     logger.info('Submission completed', { 
       requestId, 

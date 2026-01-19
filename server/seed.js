@@ -53,7 +53,8 @@ const problems = [
   }
 ];
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/oj', {
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/algou'
+, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(async () => {

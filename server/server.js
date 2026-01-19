@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 import { v4 as uuid } from 'uuid';
 import problemRoutes from './routes/problems.js';
 import authRoutes from './routes/auth.js';
+import userRoutes from './routes/users.js';
 import submitRoutes from './routes/submit.js';
 import explainRoutes from './routes/explain.js';
 import { rateLimiters } from './middleware/rateLimiter.js';
@@ -69,6 +70,7 @@ app.get('/health', (req, res) => {
 
 // API routes with rate limiting
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/submit', rateLimiters.execution, submitRoutes);
 app.use('/api/problems', rateLimiters.api, problemRoutes);
 app.use('/api/explain', explainRoutes); // Rate limiting handled in route
