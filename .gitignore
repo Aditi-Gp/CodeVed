@@ -122,3 +122,9 @@ playwright-report/
 .temp
 .tmp
 
+
+# Ignore all markdown files
+*.md
+
+# But keep README.md tracked
+!README.md
