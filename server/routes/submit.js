@@ -11,10 +11,10 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuid } from 'uuid';
-import { getExecutor, isLanguageSupported } from '../../backend/executors/index.js';
-import { generateFile } from '../../backend/generateFile.js';
-import { generateInputFile } from '../../backend/generateInputFile.js';
-import { logger } from '../../backend/utils/logger.js';
+import { getExecutor, isLanguageSupported } from '../backend/executors/index.js';
+import { generateFile } from '../backend/generateFile.js';
+import { generateInputFile } from '../backend/generateInputFile.js';
+import { logger } from '../backend/utils/logger.js';
 import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -22,8 +22,8 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const inputPath = path.join(__dirname, '../../backend/inputs');
-const codePath = path.join(__dirname, '../../backend/codes');
+const inputPath = path.join(__dirname, '../backend/inputs');
+const codePath = path.join(__dirname, '../backend/codes');
 
 if (!fs.existsSync(inputPath)) fs.mkdirSync(inputPath, { recursive: true });
 if (!fs.existsSync(codePath)) fs.mkdirSync(codePath, { recursive: true });

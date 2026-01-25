@@ -1,0 +1,23 @@
+// Java Security Policy for sandboxed execution
+// Restricts file system access, network access, and system operations
+
+grant {
+    // Allow basic I/O operations
+    permission java.io.FilePermission "<<ALL FILES>>", "read";
+    permission java.io.FilePermission "${java.io.tmpdir}/*", "write,delete";
+    
+    // Prevent network access
+    // No socket permissions granted
+    
+    // Prevent system property access
+    // No property permissions granted
+    
+    // Allow basic runtime operations
+    permission java.lang.RuntimePermission "createClassLoader";
+    permission java.lang.RuntimePermission "getClassLoader";
+    
+    // Prevent exit VM
+    // No exit VM permission granted
+};
+
+

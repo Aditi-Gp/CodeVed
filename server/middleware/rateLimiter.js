@@ -4,7 +4,7 @@
  * Uses in-memory store (for production, consider Redis)
  */
 
-import { logger } from '../../backend/utils/logger.js';
+import { logger } from '../backend/utils/logger.js';
 
 // In-memory rate limit store
 // For production, use Redis or similar distributed cache

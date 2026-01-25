@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { rateLimiters } from '../middleware/rateLimiter.js';
 import { authenticate } from '../middleware/auth.js';
-import { logger } from '../../backend/utils/logger.js';
+import { logger } from '../backend/utils/logger.js';
 
 const router = express.Router();
 

@@ -9,7 +9,7 @@ import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import { rateLimiters } from '../middleware/rateLimiter.js';
 import { optionalAuth } from '../middleware/auth.js';
-import { logger } from '../../backend/utils/logger.js';
+import { logger } from '../backend/utils/logger.js';
 
 dotenv.config();
 
