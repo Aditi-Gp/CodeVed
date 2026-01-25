@@ -1,20 +1,20 @@
 # CodeVed Online Judge
 
-A modern, web-based C++ compiler and code execution platform built with React and Node.js. This application allows users to write, compile, and execute C++ code directly in their browser with real-time syntax highlighting and user input support.
+A modern, web-based multi language support (C++, Python Java) compiler and code execution platform built with React and Node.js. This application allows users to write, compile, and execute code directly in their browser with real-time syntax highlighting and user input support.
 
 ![CodeVed Online Judge](Screenshot%20from%202025-07-26%2014-24-35.png)
 
 
-## 🚀 Features
+## Features
 
 - **Real-time Code Editor**: Monaco-style code editor with C++ syntax highlighting
-- **Instant Compilation**: Compile and execute C++ code with a single click
+- **Instant Compilation**: Compile and execute C++/Python/Java code with a single click
 - **Input Support**: Provide custom input to your programs
 - **Error Handling**: Clear error messages for compilation and runtime errors
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Modern UI**: Beautiful, intuitive interface built with Tailwind CSS
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Frontend
 - **React 18** - Modern JavaScript framework
@@ -30,7 +30,7 @@ A modern, web-based C++ compiler and code execution platform built with React an
 - **UUID** - Unique identifier generation
 - **CORS** - Cross-origin resource sharing
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before running this application, make sure you have the following installed:
 
@@ -41,7 +41,7 @@ Before running this application, make sure you have the following installed:
   - On macOS: Install Xcode Command Line Tools
   - On Windows: Install MinGW or Visual Studio
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -77,7 +77,7 @@ npm run dev
 ```
 The frontend will be available at `http://localhost:5173`
 
-## 💻 Usage
+## Usage
 
 1. **Write Code**: Enter your C++ code in the editor on the left side
 2. **Provide Input** (optional): Add any input your program needs in the input textarea
@@ -115,27 +115,8 @@ int main() {
 The sum is: 15
 ```
 
-## 🏗️ Project Structure
 
-```
-AlgoU-Online-Compiler-2/
-├── frontend/                 # React frontend application
-│   ├── src/
-│   │   ├── App.jsx          # Main React component
-│   │   ├── main.jsx         # Entry point
-│   │   └── index.css        # Global styles
-│   ├── package.json         # Frontend dependencies
-│   └── vite.config.js       # Vite configuration
-├── backend/                 # Node.js backend server
-│   ├── index.js            # Main server file
-│   ├── generateFile.js     # Code file generation
-│   ├── generateInputFile.js # Input file generation
-│   ├── executeCpp.js       # C++ compilation and execution
-│   └── package.json        # Backend dependencies
-└── README.md               # Project documentation
-```
-
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables (Frontend)
 Create a `.env` file in the frontend directory (optional):
@@ -149,7 +130,7 @@ The backend server uses port 8000 by default. You can change this by setting the
 PORT=3001 npm start
 ```
 
-## 🚀 Production Deployment
+## Production Deployment
 
 ### Backend Deployment
 ```bash
@@ -165,7 +146,7 @@ npm run build
 
 The built files will be in the `frontend/dist` directory, ready for deployment to any static hosting service.
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -173,6 +154,6 @@ The built files will be in the `frontend/dist` directory, ready for deployment t
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
