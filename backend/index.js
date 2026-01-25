@@ -213,6 +213,6 @@ app.listen(PORT, () => {
     environment: process.env.NODE_ENV || 'development',
     supportedLanguages: getSupportedLanguages(),
   });
-  console.log(`🚀 CodeVed Online Compiler Server listening on port ${PORT}!`);
-  console.log(`📝 Supported languages: ${getSupportedLanguages().join(', ')}`);
+  console.log(` CodeVed Online Compiler Server listening on port ${PORT}!`);
+  console.log(` Supported languages: ${getSupportedLanguages().join(', ')}`);
 });
