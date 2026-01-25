@@ -60,6 +60,16 @@ app.use(express.json({ limit: '10mb' })); // Limit request size
 app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
+
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'CodeVed Server',
+    env: process.env.NODE_ENV
+  });
+});
+
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
