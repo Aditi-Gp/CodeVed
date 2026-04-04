@@ -22,6 +22,8 @@ echo -e "${GREEN}✓ Docker is running${NC}"
 # Check if containers are running
 echo -e "\n${YELLOW}Checking containers...${NC}"
 
+
+
 CONTAINERS=("algou-mongodb" "algou-backend" "algou-server" "algou-frontend")
 
 for container in "${CONTAINERS[@]}"; do
