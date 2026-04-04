@@ -28,6 +28,37 @@ app.use((req, res, next) => {
   next();
 });
 
+
+app.use((req, res, next) => {
+  req.id = uuid();
+  res.setHeader('X-Request-ID', req.id);
+  next();
+});
+
+app.use((req, res, next) => {
+  req.id = uuid();
+  res.setHeader('X-Request-ID', req.id);
+  next();
+});
+
+app.use((req, res, next) => {
+  req.id = uuid();
+  res.setHeader('X-Request-ID', req.id);
+  next();
+});
+
+app.use((req, res, next) => {
+  req.id = uuid();
+  res.setHeader('X-Request-ID', req.id);
+  next();
+});
+
+app.use((req, res, next) => {
+  req.id = uuid();
+  res.setHeader('X-Request-ID', req.id);
+  next();
+});
+
 // CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
