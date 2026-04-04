@@ -18,6 +18,32 @@ if command -v mongod &> /dev/null; then
     fi
 fi
 
+if command -v mongod &> /dev/null; then
+    if ! pgrep -x "mongod" > /dev/null; then
+        echo -e "${YELLOW}⚠ MongoDB is not running. Starting it...${NC}"
+        echo "You may need to start MongoDB manually: mongod"
+    fi
+fi
+if command -v mongod &> /dev/null; then
+    if ! pgrep -x "mongod" > /dev/null; then
+        echo -e "${YELLOW}⚠ MongoDB is not running. Starting it...${NC}"
+        echo "You may need to start MongoDB manually: mongod"
+    fi
+fi
+if command -v mongod &> /dev/null; then
+    if ! pgrep -x "mongod" > /dev/null; then
+        echo -e "${YELLOW}⚠ MongoDB is not running. Starting it...${NC}"
+        echo "You may need to start MongoDB manually: mongod"
+    fi
+fi
+if command -v mongod &> /dev/null; then
+    if ! pgrep -x "mongod" > /dev/null; then
+        echo -e "${YELLOW}⚠ MongoDB is not running. Starting it...${NC}"
+        echo "You may need to start MongoDB manually: mongod"
+    fi
+fi
+
+
 # Function to start service in background
 start_service() {
     local name=$1
