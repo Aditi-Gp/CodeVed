@@ -17,7 +17,6 @@ import { getExecutor, isLanguageSupported, getSupportedLanguages } from './execu
 import { logger } from './utils/logger.js';
 import explainRoute from './routes/explain.js';
 
-// Polyfill fetch and related APIs in Node.js
 import fetch from 'node-fetch';
 import { Headers, Request, Response } from 'node-fetch';
 import { Blob } from 'fetch-blob';
@@ -33,22 +32,18 @@ globalThis.FormData = FormData;
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// Configuration - can be overridden via environment variables
 const EXECUTION_CONFIG = {
   timeout: parseInt(process.env.EXECUTION_TIMEOUT) || 10000, // 10s
   memoryLimit: parseInt(process.env.MEMORY_LIMIT) || 256 * 1024 * 1024, // 256MB
   maxOutputSize: parseInt(process.env.MAX_OUTPUT_SIZE) || 10 * 1024 * 1024, // 10MB
 };
 
-// Middleware setup
-// CORS: Allow frontend origin (can be configured via env)
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
   : ['http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com', 'http://localhost:5173'];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
       return callback(null, true);
     }

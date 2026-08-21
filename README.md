@@ -45,7 +45,7 @@ Before running this application, make sure you have the following installed:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/bhavesh1129/AlgoU-Online-Compiler-2.git
+git clone https://github.com/Aditi-Gp/CodeVed
 cd AlgoU-Online-Compiler-2
 ```
 
