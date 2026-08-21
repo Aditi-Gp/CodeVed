@@ -25,7 +25,7 @@ services:
     networks:
       - algou-network
 
-  # Backend Service (Code Execution)
+  # Backend Service 
   backend:
     build:
       context: ./backend
