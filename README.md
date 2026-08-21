@@ -10,8 +10,8 @@ A modern, web-based multi language support (C++, Python Java) compiler and code 
 - **Real-time Code Editor**: Monaco-style code editor with C++ syntax highlighting
 - **Instant Compilation**: Compile and execute C++/Python/Java code with a single click
 - **Error Handling**: Clear error messages for compilation and runtime errors
-- **Input Support**: Provide custom input to your programs
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Input Support**: Provide custom input to your programs
 - **Modern UI**: Beautiful, intuitive interface built with Tailwind CSS
 
 ## Technology Stack
