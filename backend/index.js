@@ -40,7 +40,7 @@ const EXECUTION_CONFIG = {
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com', 'http://localhost:5173', 'https://www.codeved.org/'];
+  : ['http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com', 'http://localhost:5173'];
 
 app.use(cors({
   origin: (origin, callback) => {
