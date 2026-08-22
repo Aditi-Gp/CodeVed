@@ -30,16 +30,10 @@ export function getExecutor(language, config = {}) {
   return new executors[normalizedLang](config);
 }
 
-/**
- * Check if a language is supported
- */
 export function isLanguageSupported(language) {
   return language && executors[language.toLowerCase()] !== undefined;
 }
 
-/**
- * Get list of supported languages
- */
 export function getSupportedLanguages() {
   return Object.keys(executors);
 }
