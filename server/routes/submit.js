@@ -86,6 +86,25 @@ router.post('/:id', authenticate, async (req, res) => {
 
     const results = [];
     const executor = getExecutor(language, EXECUTION_CONFIG);
+    const normalizedLanguage = language.toLowerCase();
+    const filesToCleanup = [];
+
+    let filePath;
+    let compiledExecutablePath;
+    try {
+      filePath = await generateFile(language, code);
+      filesToCleanup.push(filePath);
+
+      if (['cpp', 'java'].includes(normalizedLanguage)) {
+        compiledExecutablePath = await executor.compile(filePath, requestId);
+        if (compiledExecutablePath && compiledExecutablePath !== filePath) {
+          filesToCleanup.push(compiledExecutablePath);
+        }
+      }
+    } catch (err) {
+      logger.error('Failed to prepare submission files', { requestId, language, error: err.message });
+      throw err;
+    }
 
     // Process each test case
     for (let i = 0; i < problem.testCases.length; i++) {
@@ -94,15 +113,13 @@ router.post('/:id', authenticate, async (req, res) => {
       
       logger.info('Processing test case', { requestId, testCaseId, testCaseIndex: i });
 
-      let filePath, inputFilePath;
+      let inputFilePath;
 
       try {
-        // Generate files for this test case
-        filePath = await generateFile(language, code);
         inputFilePath = await generateInputFile(testCase.input);
 
-        // Execute code
-        const output = await executor.execute(filePath, inputFilePath, testCaseId);
+        const executablePath = compiledExecutablePath || filePath;
+        const output = await executor.runOnly(executablePath, inputFilePath, testCaseId);
         const actual = output.trim();
         const expected = testCase.output.trim();
         const passed = actual === expected;
@@ -121,14 +138,6 @@ router.post('/:id', authenticate, async (req, res) => {
           passed,
           testCaseIndex: i,
         });
-
-        // Cleanup files
-        try {
-          if (filePath && fs.existsSync(filePath)) await fs.promises.unlink(filePath);
-          if (inputFilePath && fs.existsSync(inputFilePath)) await fs.promises.unlink(inputFilePath);
-        } catch (cleanupErr) {
-          logger.warn('Cleanup failed', { requestId, testCaseId, error: cleanupErr.message });
-        }
       } catch (err) {
         logger.error('Test case execution failed', { 
           requestId, 
@@ -144,15 +153,19 @@ router.post('/:id', authenticate, async (req, res) => {
           passed: false,
           testCaseIndex: i,
         });
-
-        // Cleanup on error
+      } finally {
         try {
-          if (filePath && fs.existsSync(filePath)) await fs.promises.unlink(filePath);
           if (inputFilePath && fs.existsSync(inputFilePath)) await fs.promises.unlink(inputFilePath);
         } catch (cleanupErr) {
-          // Ignore cleanup errors
+          logger.warn('Input cleanup failed', { requestId, testCaseId: `${requestId}-${i}`, error: cleanupErr.message });
         }
       }
+    }
+
+    try {
+      await executor.cleanup(filesToCleanup);
+    } catch (cleanupErr) {
+      logger.warn('Final cleanup failed', { requestId, error: cleanupErr.message });
     }
 
     const passedAll = results.every(r => r.passed);
