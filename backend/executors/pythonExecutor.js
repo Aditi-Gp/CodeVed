@@ -47,8 +47,6 @@ export class PythonExecutor extends BaseExecutor {
           env: {
             ...process.env,
             PYTHONUNBUFFERED: "1",
-            // Limit memory using ulimit (if available)
-            // This is handled at the system level
           },
         }
       );
@@ -132,4 +130,3 @@ export class PythonExecutor extends BaseExecutor {
     }
   }
 }
-

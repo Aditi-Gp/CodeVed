@@ -52,9 +52,9 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-// 🔁 Retry logic with exponential backoff
+// Retry logic with exponential backoff
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
+ghjkl;
 async function callWithRetry(apiCall, retries = 3) {
   try {
     return await apiCall();

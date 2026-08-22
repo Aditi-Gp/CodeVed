@@ -22,10 +22,6 @@ export class BaseExecutor {
     };
   }
 
-  /**
-   * Execute a command with timeout, memory limits, and proper cleanup
-   * Returns { stdout, stderr, exitCode, duration }
-   */
   async executeCommand(command, args = [], options = {}) {
     const startTime = Date.now();
     const timeout = options.timeout || this.config.timeout;
