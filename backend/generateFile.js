@@ -16,15 +16,11 @@ if (!fs.existsSync(dirCodes)) {
     fs.mkdirSync(dirCodes, { recursive: true });
 }
 
-/**
- * Map language identifier to file extension
- * Critical: Ensures correct file extensions for compilation/execution
- */
 function getFileExtension(language) {
     const extensionMap = {
         cpp: 'cpp',
         java: 'java',
-        python: 'py', // Python uses .py, not .python
+        python: 'py', 
     };
     return extensionMap[language.toLowerCase()] || language.toLowerCase();
 }

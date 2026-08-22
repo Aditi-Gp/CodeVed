@@ -40,14 +40,13 @@ const EXECUTION_CONFIG = {
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com', 'http://localhost:5173'];
+  : ['http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com', 'http://localhost:5173', 'https://www.codeved.org', 'https://codeved.org/'];
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) {
       return callback(null, true);
     }
-    // Allow requests from allowed origins
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
@@ -62,8 +61,10 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '10mb' })); // Limit request size
 app.use(bodyParser.json());
-app.use('/api/explain', explainRoute);
 
+//route1
+app.use('/api/explain', explainRoute);
+a
 // Request ID middleware for tracking
 app.use((req, res, next) => {
   req.id = uuid();
@@ -74,7 +75,7 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => {
   res.json({ 
     online: 'compiler',
-    version: '2.0.0',
+    version: '2.0.1',
     supportedLanguages: getSupportedLanguages(),
     timestamp: new Date().toISOString(),
   });
@@ -88,7 +89,7 @@ app.get("/languages", (req, res) => {
   });
 });
 
-// Code execution endpoint - Production-grade with comprehensive error handling
+
 app.post("/run", async (req, res) => {
   const requestId = req.id;
   const { language = 'cpp', code, input = '' } = req.body;
