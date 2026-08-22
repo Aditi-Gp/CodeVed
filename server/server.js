@@ -35,6 +35,8 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       'http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com',
       'http://localhost:5173',
       'http://localhost:3000',
+      'https://codeved.org',
+      'https://www.codeved.org'
     ];
 
 app.use(cors({
