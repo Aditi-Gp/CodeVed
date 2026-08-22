@@ -4,6 +4,7 @@
  */
 
 import express from 'express';
+import mongoose from 'mongoose'; // IMPORT MONGOOSE FOR ObjectId CASTING
 import User from '../models/User.js';
 import Submission from '../models/Submission.js';
 import { authenticate } from '../middleware/auth.js';
@@ -53,7 +54,6 @@ router.get('/me/dashboard', authenticate, async (req, res) => {
       .select('problemName language verdict status submittedAt')
       .lean();
 
-    // Format recent submissions
     const formattedSubmissions = recentSubmissions.map(sub => ({
       problemName: sub.problemName,
       language: sub.language,
@@ -63,6 +63,44 @@ router.get('/me/dashboard', authenticate, async (req, res) => {
 
     // Get joined date from user creation
     const joinedDate = user.createdAt || user._id.getTimestamp();
+
+    // ==========================================
+    // NEW: HEATMAP AGGREGATION PIPELINE
+    // ==========================================
+    // Only fetch data for the last 365 days to keep the query fast
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    const heatmapData = await Submission.aggregate([
+      { 
+        // Step 1: Filter submissions to this user from the last year
+        $match: { 
+          userId: new mongoose.Types.ObjectId(userId), // Must cast to ObjectId in aggregations
+          submittedAt: { $gte: oneYearAgo } 
+        } 
+      },
+      { 
+        // Step 2: Group by the calendar day
+        $group: {
+          // Format the Date object into a 'YYYY-MM-DD' string
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$submittedAt" } },
+          // Count how many submissions fall on this day
+          count: { $sum: 1 }
+        }
+      },
+      { 
+        // Step 3: Rename '_id' to 'date' for a cleaner frontend response
+        $project: {
+          _id: 0,
+          date: "$_id",
+          count: 1
+        }
+      },
+      { 
+        // Step 4: Sort chronologically
+        $sort: { date: 1 } 
+      }
+    ]);
 
     logger.info('Dashboard data retrieved', { requestId, userId });
 
@@ -80,6 +118,7 @@ router.get('/me/dashboard', authenticate, async (req, res) => {
           accuracy: parseFloat(accuracy),
           totalSubmissions: totalSubmissions,
         },
+        heatmap: heatmapData, // Pass the aggregated data to the frontend
         recentActivity: formattedSubmissions,
       },
     });
@@ -98,10 +137,3 @@ router.get('/me/dashboard', authenticate, async (req, res) => {
 });
 
 export default router;
-
-
-
-
-
-
-
