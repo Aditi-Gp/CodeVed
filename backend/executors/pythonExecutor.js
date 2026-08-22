@@ -36,9 +36,6 @@ export class PythonExecutor extends BaseExecutor {
     const filesToCleanup = [filePath];
 
     try {
-      // Python doesn't need compilation, execute directly
-      // Resource limits are enforced at the system level via timeout and process management
-      // For production-grade sandboxing, consider using Docker containers or PyPy sandbox
       const child = spawn(
         "python3",
         ["-u", filePath], // -u for unbuffered output
