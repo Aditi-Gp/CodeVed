@@ -114,14 +114,14 @@ app.use((req, res) => {
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     logger.info('MongoDB connected successfully', {});
-    console.log('✅ MongoDB connected');
+    console.log('MongoDB connected');
   })
   .catch(err => {
     logger.error('MongoDB connection failed', { 
       error: err.message,
       stack: err.stack 
     });
-    console.error('❌ MongoDB connection error:', err);
+    console.error('MongoDB connection error:', err);
     process.exit(1);
   });
 
@@ -131,7 +131,7 @@ app.listen(PORT, () => {
     port: PORT, 
     environment: process.env.NODE_ENV || 'development' 
   });
-  console.log(`🚀 Server started on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Server started on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
