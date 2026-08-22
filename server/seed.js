@@ -60,7 +60,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/algou'
 }).then(async () => {
   console.log("Connected to MongoDB");
 
-  await Problem.deleteMany(); // optional: clean old data
+  await Problem.deleteMany(); 
   await Problem.insertMany(problems);
 
   console.log("Inserted problems successfully");

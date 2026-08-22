@@ -54,10 +54,3 @@ submissionSchema.index({ userId: 1, submittedAt: -1 });
 
 const Submission = mongoose.model('Submission', submissionSchema);
 export default Submission;
-
-
-
-
-
-
-
