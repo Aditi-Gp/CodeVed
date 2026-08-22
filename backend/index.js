@@ -1,7 +1,7 @@
 /**
- * Main backend server for AlgoU Online Compiler
- * Production-grade online judge with multi-language support
+ * Main backend server for CodeVed Online Compiler
  * Architecture: Modular execution system with structured logging
+ * Copyright: Aditi Gupta
  */
 
 import dotenv from 'dotenv';
@@ -40,7 +40,7 @@ const EXECUTION_CONFIG = {
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com', 'http://localhost:5173'];
+  : ['http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com', 'http://localhost:5173', 'https://www.codeved.org/'];
 
 app.use(cors({
   origin: (origin, callback) => {
