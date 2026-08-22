@@ -4,7 +4,7 @@ import Problem from '../models/Problem.js';
 
 const router = express.Router();
 
-// 🔧 ADD THIS: List all problems
+//  ADD THIS: List all problems
 router.get('/', async (req, res) => {
   try {
     const problems = await Problem.find();
