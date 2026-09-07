@@ -58,95 +58,65 @@ export class JavaExecutor extends BaseExecutor {
         },
         (error, stdout, stderr) => {
           const duration = Date.now() - compileStart;
-          
+
           if (error) {
-            logger.compilationError("", "java", jobId, 
+            logger.compilationError("", "java", jobId,
               new Error(stderr || error.message), duration);
             return reject(new Error(stderr || error.message || "Compilation failed"));
           }
 
           logger.compilationSuccess("", "java", jobId, duration);
-          resolve();
+
+          const code = fs.readFileSync(filePath, "utf-8");
+          const className = this.extractClassName(code);
+          const jobDir = path.dirname(filePath);
+          resolve(path.join(jobDir, `${className}.class`));
         }
       );
     });
   }
 
   /**
-   * Execute compiled Java class with security manager and resource limits
+   * Run an already compiled Java class without recompiling.
    */
-  async execute(filePath, inputPath, requestId = "") {
+  async runOnly(executablePath, inputPath, requestId = "") {
     const startTime = Date.now();
-    const jobId = path.basename(filePath).split(".")[0];
-    
+    const className = path.extname(executablePath) === ".class"
+      ? path.basename(executablePath, ".class")
+      : path.basename(executablePath);
+    const jobDir = path.dirname(executablePath);
+    const jobId = className;
+
     logger.executionStart(requestId, "java", jobId);
-    
-    let className;
-    const filesToCleanup = [filePath];
+    logger.runtimeStart(requestId, "java", jobId);
 
     try {
-      // Read code to extract class name
-      const code = await fs.promises.readFile(filePath, "utf-8");
-      className = this.extractClassName(code);
-
-      // Java REQUIRES filename == public class name
-      const jobDir = path.join(this.classPath, jobId);
-      await fs.promises.mkdir(jobDir, { recursive: true });
-
-      const javaFilePath = path.join(jobDir, `${className}.java`);
-      await fs.promises.writeFile(javaFilePath, code);
-
-      // Override filePath for compilation
-      filePath = javaFilePath;
-
-
-      logger.compilationStart(requestId, "java", jobId);
-      await this.compile(filePath, jobId);
-
-      // Find compiled .class file
-      const classFile = path.join(jobDir, `${className}.class`);
-
-      if (!fs.existsSync(classFile)) {
-        throw new Error(`Compiled class file not found: ${className}.class`);
-      }
-      filesToCleanup.push(classFile);
-
-      logger.runtimeStart(requestId, "java", jobId);
-
-      // Execute Java with security constraints and resource limits
-      // Memory limit: -Xmx sets max heap size
-      // Note: Security manager is optional - can be enabled if policy file exists
       const memoryLimitMB = Math.floor(this.config.memoryLimit / (1024 * 1024));
       const policyPath = path.join(__dirname, "../java.policy");
       const hasPolicyFile = fs.existsSync(policyPath);
-      
+
       const javaArgs = [
         "-cp", jobDir,
         `-Xmx${memoryLimitMB}m`,
         "-Xms64m",
         "-XX:MaxMetaspaceSize=64m",
-        className
+        className,
       ];
-      
-      // Add security manager only if policy file exists
+
       if (hasPolicyFile) {
         javaArgs.push(`-Djava.security.manager`);
         javaArgs.push(`-Djava.security.policy=${policyPath}`);
       }
-      
-      javaArgs.push(className);
-      
+
       const child = spawn("java", javaArgs, {
-        cwd: path.dirname(filePath),
+        cwd: jobDir,
         stdio: ["pipe", "pipe", "pipe"],
         env: {
           ...process.env,
           JAVA_HOME: process.env.JAVA_HOME || "/usr/lib/jvm/default-java",
         },
-      });   
+      });
 
-
-      // Pipe input if provided
       if (inputPath && fs.existsSync(inputPath)) {
         const inputStream = fs.createReadStream(inputPath);
         inputStream.pipe(child.stdin);
@@ -188,23 +158,18 @@ export class JavaExecutor extends BaseExecutor {
         child.on("close", (code) => {
           clearTimeout(timer);
           if (code !== 0 && code !== null) {
-            // Java often writes to stderr even on success (e.g., "Picked up JAVA_TOOL_OPTIONS")
-            // Filter out common JVM warnings
             const filteredStderr = stderr
-              .split('\n')
-              .filter(line => {
+              .split("\n")
+              .filter((line) => {
                 const trimmed = line.trim();
-                return trimmed !== '' && 
-                       !trimmed.includes('Picked up') && 
-                       !trimmed.includes('WARNING');
+                return trimmed !== "" && !trimmed.includes("Picked up") && !trimmed.includes("WARNING");
               })
-              .join('\n')
+              .join("\n")
               .trim();
-            
+
             if (filteredStderr) {
               reject(new Error(filteredStderr || `Runtime error with exit code ${code}`));
             } else {
-              // No meaningful error, treat as success
               resolve();
             }
           } else {
@@ -214,9 +179,8 @@ export class JavaExecutor extends BaseExecutor {
 
         child.on("error", (error) => {
           clearTimeout(timer);
-          // Provide more helpful error messages
-          if (error.code === 'ENOENT') {
-            reject(new Error('Java runtime not found. Please ensure Java is installed and in PATH.'));
+          if (error.code === "ENOENT") {
+            reject(new Error("Java runtime not found. Please ensure Java is installed and in PATH."));
           } else {
             reject(new Error(`Failed to execute Java: ${error.message}`));
           }
@@ -227,17 +191,36 @@ export class JavaExecutor extends BaseExecutor {
       logger.runtimeSuccess(requestId, "java", jobId, duration, stdout.length);
       logger.executionComplete(requestId, "java", jobId, duration);
 
-      // Cleanup
-      await this.cleanup(filesToCleanup);
-
       return stdout || stderr;
     } catch (error) {
       const duration = Date.now() - startTime;
       logger.runtimeError(requestId, "java", jobId, error, duration);
-      
-      // Cleanup on error
+      throw error;
+    }
+  }
+
+  /**
+   * Execute compiled Java class with security manager and resource limits
+   */
+  async execute(filePath, inputPath, requestId = "") {
+    const startTime = Date.now();
+    const jobId = path.basename(filePath).split(".")[0];
+
+    logger.executionStart(requestId, "java", jobId);
+
+    const filesToCleanup = [filePath];
+
+    try {
+      const compiledPath = await this.compile(filePath, jobId);
+      filesToCleanup.push(compiledPath);
+
+      const result = await this.runOnly(compiledPath, inputPath, requestId);
       await this.cleanup(filesToCleanup);
-      
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      logger.runtimeError(requestId, "java", jobId, error, duration);
+      await this.cleanup(filesToCleanup);
       throw error;
     }
   }

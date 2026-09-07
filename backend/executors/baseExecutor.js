@@ -110,6 +110,20 @@ export class BaseExecutor {
   }
 
   /**
+   * Optional compile hook. Default is a no-op for interpreted languages.
+   */
+  async compile(filePath, jobId) {
+    return filePath;
+  }
+
+  /**
+   * Must be implemented by subclasses - run without recompiling.
+   */
+  async runOnly(executablePath, inputPath) {
+    throw new Error("runOnly() must be implemented by subclass");
+  }
+
+  /**
    * Abstract method - must be implemented by subclasses
    */
   async execute(filePath, inputPath) {

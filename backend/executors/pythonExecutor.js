@@ -24,21 +24,19 @@ export class PythonExecutor extends BaseExecutor {
   }
 
   /**
-   * Execute Python code with resource limits and sandboxing
+   * Run a Python script without any compilation step.
    */
-  async execute(filePath, inputPath, requestId = "") {
+  async runOnly(executablePath, inputPath, requestId = "") {
     const startTime = Date.now();
-    const jobId = path.basename(filePath).split(".")[0];
-    
+    const jobId = path.basename(executablePath).split(".")[0];
+
     logger.executionStart(requestId, "python", jobId);
     logger.runtimeStart(requestId, "python", jobId);
-
-    const filesToCleanup = [filePath];
 
     try {
       const child = spawn(
         "python3",
-        ["-u", filePath], // -u for unbuffered output
+        ["-u", executablePath],
         {
           stdio: ["pipe", "pipe", "pipe"],
           env: {
@@ -48,7 +46,6 @@ export class PythonExecutor extends BaseExecutor {
         }
       );
 
-      // Pipe input if provided
       if (inputPath && fs.existsSync(inputPath)) {
         const inputStream = fs.createReadStream(inputPath);
         inputStream.pipe(child.stdin);
@@ -90,7 +87,6 @@ export class PythonExecutor extends BaseExecutor {
         child.on("close", (code) => {
           clearTimeout(timer);
           if (code !== 0 && code !== null) {
-            // Python errors go to stderr, but some warnings might be there too
             const errorMsg = stderr.trim();
             if (errorMsg) {
               reject(new Error(errorMsg || `Runtime error with exit code ${code}`));
@@ -112,17 +108,34 @@ export class PythonExecutor extends BaseExecutor {
       logger.runtimeSuccess(requestId, "python", jobId, duration, stdout.length);
       logger.executionComplete(requestId, "python", jobId, duration);
 
-      // Cleanup
-      await this.cleanup(filesToCleanup);
-
       return stdout || stderr;
     } catch (error) {
       const duration = Date.now() - startTime;
       logger.runtimeError(requestId, "python", jobId, error, duration);
-      
-      // Cleanup on error
+      throw error;
+    }
+  }
+
+  /**
+   * Execute Python code with resource limits and sandboxing
+   */
+  async execute(filePath, inputPath, requestId = "") {
+    const startTime = Date.now();
+    const jobId = path.basename(filePath).split(".")[0];
+
+    logger.executionStart(requestId, "python", jobId);
+    logger.runtimeStart(requestId, "python", jobId);
+
+    const filesToCleanup = [filePath];
+
+    try {
+      const result = await this.runOnly(filePath, inputPath, requestId);
       await this.cleanup(filesToCleanup);
-      
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      logger.runtimeError(requestId, "python", jobId, error, duration);
+      await this.cleanup(filesToCleanup);
       throw error;
     }
   }

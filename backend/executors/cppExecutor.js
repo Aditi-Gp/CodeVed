@@ -56,32 +56,21 @@ export class CppExecutor extends BaseExecutor {
   }
 
   /**
-   * Execute compiled C++ binary
+   * Run an already compiled C++ binary without recompiling.
    */
-  async execute(filePath, inputPath, requestId = "") {
+  async runOnly(executablePath, inputPath, requestId = "") {
     const startTime = Date.now();
-    const jobId = path.basename(filePath).split(".")[0];
-    
-    logger.executionStart(requestId, "cpp", jobId);
-    logger.compilationStart(requestId, "cpp", jobId);
+    const jobId = path.basename(executablePath).split(".")[0];
 
-    let executablePath;
-    const filesToCleanup = [filePath];
+    logger.executionStart(requestId, "cpp", jobId);
+    logger.runtimeStart(requestId, "cpp", jobId);
 
     try {
-      // Compile
-      executablePath = await this.compile(filePath, jobId);
-      filesToCleanup.push(executablePath);
-
-      logger.runtimeStart(requestId, "cpp", jobId);
-
-      // Execute with input piping
-      const child = spawn(`./${jobId}.out`, [], {
-        cwd: this.outputPath,
+      const child = spawn(executablePath, [], {
+        cwd: path.dirname(executablePath),
         stdio: ["pipe", "pipe", "pipe"],
       });
 
-      // Pipe input if provided
       if (inputPath && fs.existsSync(inputPath)) {
         const inputStream = fs.createReadStream(inputPath);
         inputStream.pipe(child.stdin);
@@ -139,17 +128,37 @@ export class CppExecutor extends BaseExecutor {
       logger.runtimeSuccess(requestId, "cpp", jobId, duration, stdout.length);
       logger.executionComplete(requestId, "cpp", jobId, duration);
 
-      // Cleanup
-      await this.cleanup(filesToCleanup);
-
       return stdout || stderr;
     } catch (error) {
       const duration = Date.now() - startTime;
       logger.runtimeError(requestId, "cpp", jobId, error, duration);
-      
-      // Cleanup on error
+      throw error;
+    }
+  }
+
+  /**
+   * Execute compiled C++ binary
+   */
+  async execute(filePath, inputPath, requestId = "") {
+    const startTime = Date.now();
+    const jobId = path.basename(filePath).split(".")[0];
+
+    logger.executionStart(requestId, "cpp", jobId);
+    logger.compilationStart(requestId, "cpp", jobId);
+
+    const filesToCleanup = [filePath];
+
+    try {
+      const executablePath = await this.compile(filePath, jobId);
+      filesToCleanup.push(executablePath);
+
+      const result = await this.runOnly(executablePath, inputPath, requestId);
       await this.cleanup(filesToCleanup);
-      
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      logger.runtimeError(requestId, "cpp", jobId, error, duration);
+      await this.cleanup(filesToCleanup);
       throw error;
     }
   }
