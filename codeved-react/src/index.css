@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Kalam:wght@300;400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #f4f0e8;
+  --paper2: #ece6db;
+  --ink: #181714;
+  --muted: #6e6a63;
+  --line: #d6cfc3;
+  --acid: #d9ff5a;
+  --orange: #e85d31;
+  --green: #247d63;
+  --white: #fffdf8;
+  --red: #d94f2b;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "DM Sans", sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .22;
+  z-index: 1;
+  background-image: radial-gradient(#8f897d .55px, transparent .55px);
+  background-size: 9px 9px;
+  mix-blend-mode: multiply;
+}
+* { box-sizing: border-box; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--acid); color: var(--ink); }
+
+@keyframes blink { 0%,100% { opacity: 1 } 50% { opacity: 0 } }
+@keyframes revealLine {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scroll { to { transform: translateX(-50%); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes hoverFloat { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
+@keyframes blinkEye { 0%,46%,48%,50%,100% { transform: scaleY(1); } 47%,49% { transform: scaleY(.1); } }
+@keyframes authFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(15%, 15%) scale(1.1); } }
+@keyframes authPulseBg { 0%,100% { opacity: .85; } 50% { opacity: 1; } }
+@keyframes authTyping { from { width: 0; } to { width: 100%; } }
+@keyframes authBlinkCaret { from, to { border-color: transparent; } 50% { border-color: var(--orange); } }
+
+.animate-code-line {
+  opacity: 0;
+  animation: revealLine .25s ease-out forwards;
+}
+.blinking-cursor {
+  animation: blink 1s step-end infinite;
+  margin-left: 6px;
+  display: inline-block;
+  font-size: 10px;
+}
+.marquee { animation: scroll 25s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
