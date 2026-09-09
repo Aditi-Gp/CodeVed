@@ -1,8 +1,6 @@
-/**
- * Authentication Routes
- * Production-grade auth with proper validation, logging, and security
- */
+import dotenv from 'dotenv';
 
+dotenv.config();
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
