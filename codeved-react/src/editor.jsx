@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { explainCode, runCode as executeCode } from "./api.js";
+import { handleCodeKeyDown } from "./editorUtils.js";
 
 const templates = {
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Ready to compile. Change the world!" << endl;\n    return 0;\n}`,
@@ -39,18 +40,6 @@ function EditorApp() {
     if (!previewRef.current) return;
     previewRef.current.scrollTop = event.currentTarget.scrollTop;
     previewRef.current.scrollLeft = event.currentTarget.scrollLeft;
-  };
-
-  const handleEditorKeyDown = (event) => {
-    if (event.key !== "Tab") return;
-    event.preventDefault();
-    const start = event.currentTarget.selectionStart;
-    const end = event.currentTarget.selectionEnd;
-    setCode(`${code.slice(0, start)}    ${code.slice(end)}`);
-    window.requestAnimationFrame(() => {
-      event.currentTarget.selectionStart = start + 4;
-      event.currentTarget.selectionEnd = start + 4;
-    });
   };
 
   const runCode = async () => {
@@ -105,7 +94,7 @@ function EditorApp() {
           <Pane title="workspace.src" suffix="EDITOR" className="bg-[var(--white)]">
             <div className="relative h-[390px] min-h-[350px] overflow-hidden font-mono text-sm leading-[1.6]">
               <pre ref={previewRef} aria-hidden="true" className="pointer-events-none absolute inset-0 m-0 overflow-auto whitespace-pre bg-[var(--white)] p-5 text-[var(--ink)]">{highlightCode(code, language)}</pre>
-              <textarea ref={textareaRef} value={code} onChange={(event) => setCode(event.target.value)} onScroll={syncScroll} onKeyDown={handleEditorKeyDown} spellCheck="false" autoCapitalize="off" autoComplete="off" className="absolute inset-0 z-[1] h-full w-full resize-none overflow-auto whitespace-pre bg-transparent p-5 font-mono text-sm leading-[1.6] text-transparent caret-[var(--ink)] outline-none selection:bg-[rgba(217,255,90,.35)]" />
+              <textarea ref={textareaRef} value={code} onChange={(event) => setCode(event.target.value)} onScroll={syncScroll} onKeyDown={(event) => handleCodeKeyDown(event, code, setCode)} spellCheck="false" autoCapitalize="off" autoComplete="off" className="absolute inset-0 z-[1] h-full w-full resize-none overflow-auto whitespace-pre bg-transparent p-5 font-mono text-sm leading-[1.6] text-transparent caret-[var(--ink)] outline-none selection:bg-[rgba(217,255,90,.35)]" />
             </div>
           </Pane>
 

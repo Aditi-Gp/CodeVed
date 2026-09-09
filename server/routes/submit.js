@@ -35,6 +35,11 @@ const EXECUTION_CONFIG = {
   maxOutputSize: 10 * 1024 * 1024, // 10MB
 };
 
+const sanitizeSubmissionError = (message) => message
+  .replaceAll(process.cwd(), '[workspace]')
+  .replace(/[A-Z]:\\[^\r\n ]+/gi, '[path]')
+  .replace(/\/[^\r\n ]+\/(?:codes|inputs|outputs)\/[^\r\n ]+/g, '[path]');
+
 /**
  * Submit solution to a problem
  * Requires authentication
@@ -247,7 +252,7 @@ router.post('/:id', authenticate, async (req, res) => {
     res.status(500).json({ 
       error: 'Submission failed', 
       requestId,
-      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+      details: process.env.NODE_ENV === 'development' ? sanitizeSubmissionError(err.message || '') : undefined,
     });
   }
 });

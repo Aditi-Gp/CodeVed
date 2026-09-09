@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { explainCode, getProblem, getToken, runCode, submitCode } from "./api.js";
+import { clearSession, explainCode, getProblem, getToken, runCode, submitCode } from "./api.js";
+import { handleCodeKeyDown } from "./editorUtils.js";
 
 const templates = {
-  cpp: `class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Your code here\n        \n    }\n};`,
-  java: `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your code here\n        \n    }\n}`,
-  python: `class Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        # Your code here\n        pass`,
+  cpp: `#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    // Read input and write your solution here\n    return 0;\n}`,
+  java: `import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // Read input and write your solution here\n    }\n}`,
+  python: `def main():\n    # Read input and write your solution here\n    pass\n\nif __name__ == "__main__":\n    main()`,
 };
 
 function ProblemDetailsApp() {
@@ -21,6 +22,7 @@ function ProblemDetailsApp() {
   const [aiMessage, setAiMessage] = useState("");
   const [leftWidth, setLeftWidth] = useState(45);
   const [resizing, setResizing] = useState(false);
+  const [authenticated, setAuthenticated] = useState(Boolean(getToken()));
   const leftPaneRef = useRef(null);
   const workspaceRef = useRef(null);
 
@@ -66,30 +68,27 @@ function ProblemDetailsApp() {
     setVerdict(null);
   };
 
-  const handleEditorKeyDown = (event) => {
-    if (event.key !== "Tab") return;
-    event.preventDefault();
-    const start = event.currentTarget.selectionStart;
-    const end = event.currentTarget.selectionEnd;
-    const nextCode = `${code.slice(0, start)}    ${code.slice(end)}`;
-    setCode(nextCode);
-    window.requestAnimationFrame(() => {
-      event.currentTarget.selectionStart = start + 4;
-      event.currentTarget.selectionEnd = start + 4;
-    });
-  };
-
   const executeCode = async (action) => {
     setRunning(true);
     setVerdict({ type: "running", title: "Pending execution..." });
     try {
-      const response = action === "run"
-        ? await runCode(language, code, input)
-        : await submitCode(problem?._id, language, code);
-      const passed = action === "run" ? true : response.verdict === "Accepted";
-      setVerdict({ type: passed ? "success" : "fail", title: action === "run" ? "✓ Code executed" : (passed ? "✓ Accepted" : `✗ ${response.verdict}`), passed, results: response.results });
+      if (action === "run") {
+        const results = [];
+        for (const testCase of problem?.testCases || []) {
+          const response = await runCode(language, code, testCase.input || "");
+          const actual = (response.output || "").trim();
+          const expected = (testCase.output || "").trim();
+          results.push({ input: testCase.input, expected, actual, passed: actual === expected });
+        }
+        const passed = results.length > 0 && results.every((result) => result.passed);
+        setVerdict({ type: passed ? "success" : "fail", title: passed ? "✓ All test cases passed" : "✗ Some test cases failed", passed, results });
+      } else {
+        const response = await submitCode(problem?._id, language, code);
+        const passed = response.verdict === "Accepted";
+        setVerdict({ type: passed ? "success" : "fail", title: passed ? "✓ Accepted" : `✗ ${response.verdict || "Submission failed"}`, passed, results: response.results || [] });
+      }
     } catch (requestError) {
-      setVerdict({ type: "fail", title: requestError.message });
+      setVerdict({ type: "fail", title: requestError.message || "Execution failed. Check that the backend is running." });
     } finally {
       setRunning(false);
     }
@@ -116,7 +115,7 @@ function ProblemDetailsApp() {
             CodeVed
           </a>
           <nav className="hidden gap-[30px] text-sm text-[var(--muted)] md:flex"><a href="/problemlist.html" className="font-semibold text-[var(--ink)]">Problems</a><a href="/compiler.html">Compiler</a><a href="/">Learn</a></nav>
-          <div className="hidden items-center gap-[18px] sm:flex"><a href="/login&register.html" className="text-sm text-[var(--muted)]">Sign in</a><a href="/dashboard.html" className="border border-[var(--ink)] bg-[var(--white)] px-4 py-2 font-sans text-[13px] font-semibold shadow-[2px_2px_0_var(--ink)]">Dashboard ↗</a></div>
+          <div className="hidden items-center gap-[18px] sm:flex">{authenticated ? <button onClick={() => { clearSession(); setAuthenticated(false); }} className="text-sm text-[var(--muted)]">Log out</button> : <a href="/login&register.html" className="text-sm text-[var(--muted)]">Sign in</a>}<a href="/dashboard.html" className="border border-[var(--ink)] bg-[var(--white)] px-4 py-2 font-sans text-[13px] font-semibold shadow-[2px_2px_0_var(--ink)]">Dashboard ↗</a></div>
         </div>
       </header>
 
@@ -133,7 +132,7 @@ function ProblemDetailsApp() {
 
         <section className="flex min-h-[600px] min-w-0 flex-1 flex-col overflow-hidden border border-[var(--ink)] bg-[#1d1c1a] shadow-[6px_6px_0_rgba(24,23,20,.08)]">
           <div className="flex h-[52px] shrink-0 items-center justify-between border-b border-[#45413c] bg-[#181714] px-4"><label className="relative"><span className="sr-only">Language</span><select value={language} onChange={(event) => changeLanguage(event.target.value)} className="appearance-none border border-[#45413c] bg-[#2a2824] px-3 py-1.5 pr-7 font-sans text-xs font-semibold text-[#e9e4d8] outline-none focus:border-[var(--orange)]"><option value="cpp">C++</option><option value="java">Java</option><option value="python">Python</option></select><span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[#e9e4d8]">▼</span></label><button onClick={requestExplanation} disabled={explaining} className="border border-[var(--ink)] bg-[var(--white)] px-3 py-1.5 font-sans text-[11px] font-semibold text-[var(--ink)] shadow-[3px_3px_0_var(--orange)] disabled:opacity-60">{explaining ? "Generating..." : "✨ Explain Code"}</button></div>
-          <textarea value={code} onChange={(event) => setCode(event.target.value)} onKeyDown={handleEditorKeyDown} spellCheck="false" placeholder="Write your solution here..." className="min-h-[320px] flex-1 resize-none border-0 bg-[#1d1c1a] p-5 font-mono text-sm leading-[1.7] text-[#e9e4d8] outline-none selection:bg-[rgba(217,255,90,.2)]" />
+          <textarea value={code} onChange={(event) => setCode(event.target.value)} onKeyDown={(event) => handleCodeKeyDown(event, code, setCode)} spellCheck="false" placeholder="Write your solution here..." className="min-h-[320px] flex-1 resize-none border-0 bg-[#1d1c1a] p-5 font-mono text-sm leading-[1.7] text-[#e9e4d8] outline-none selection:bg-[rgba(217,255,90,.2)]" />
           <textarea value={input} onChange={(event) => setInput(event.target.value)} spellCheck="false" placeholder="STDIN (optional)" className="min-h-[80px] shrink-0 resize-y border-t border-[#45413c] bg-[#24221e] p-4 font-mono text-xs text-[#e9e4d8] outline-none" />
           {verdict && <Verdict verdict={verdict} onClose={() => setVerdict(null)} />}
           <div className="flex h-[60px] shrink-0 items-center justify-end gap-4 border-t border-[#45413c] bg-[#181714] px-5"><button onClick={() => executeCode("run")} disabled={running || !problem?._id} className="border border-[var(--ink)] bg-[var(--acid)] px-4 py-2 font-sans text-[13px] font-semibold text-[var(--ink)] shadow-[3px_3px_0_var(--ink)] disabled:cursor-not-allowed disabled:opacity-60">{running ? "Running..." : "▸ Run"}</button><button onClick={() => executeCode("submit")} disabled={running || !problem?._id || !getToken()} className="border border-[var(--ink)] bg-[var(--green)] px-4 py-2 font-sans text-[13px] font-semibold text-[var(--white)] shadow-[3px_3px_0_var(--ink)] disabled:cursor-not-allowed disabled:opacity-60">{running ? "Submitting..." : "Submit"}</button></div>

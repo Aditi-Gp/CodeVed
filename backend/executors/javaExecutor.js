@@ -59,6 +59,10 @@ export class JavaExecutor extends BaseExecutor {
         (error, stdout, stderr) => {
           const duration = Date.now() - compileStart;
 
+          if (error?.code === "ENOENT" || stderr.includes("'javac' is not recognized") || stderr.includes("javac: command not found")) {
+            return reject(new Error("Java compiler not found. Install JDK 17+ and add javac to PATH."));
+          }
+
           if (error) {
             logger.compilationError("", "java", jobId,
               new Error(stderr || error.message), duration);
@@ -113,7 +117,7 @@ export class JavaExecutor extends BaseExecutor {
         stdio: ["pipe", "pipe", "pipe"],
         env: {
           ...process.env,
-          JAVA_HOME: process.env.JAVA_HOME || "/usr/lib/jvm/default-java",
+          ...(process.env.JAVA_HOME ? { JAVA_HOME: process.env.JAVA_HOME } : {}),
         },
       });
 

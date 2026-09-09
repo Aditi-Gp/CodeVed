@@ -38,6 +38,11 @@ const EXECUTION_CONFIG = {
   maxOutputSize: parseInt(process.env.MAX_OUTPUT_SIZE) || 10 * 1024 * 1024, // 10MB
 };
 
+const sanitizeExecutionError = (message) => message
+  .replaceAll(process.cwd(), "[workspace]")
+  .replace(/[A-Z]:\\[^\r\n ]+/gi, "[path]")
+  .replace(/\/[^\r\n ]+\/(?:codes|inputs|outputs)\/[^\r\n ]+/g, "[path]");
+
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',')
   : ['http://codeved-frontend-bucket.s3-website.eu-north-1.amazonaws.com', 'http://localhost:5173', 'https://www.codeved.org', 'https://codeved.org/'];
@@ -162,7 +167,7 @@ app.post("/run", async (req, res) => {
 
     // Determine error type for better user experience
     let statusCode = 500;
-    let errorMessage = error.message || 'An error occurred while executing the code';
+    let errorMessage = sanitizeExecutionError(error.message || 'An error occurred while executing the code');
 
     if (error.message.includes('timeout') || error.message.includes('timed out')) {
       statusCode = 408; // Request Timeout

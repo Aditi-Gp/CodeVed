@@ -34,6 +34,9 @@ function getFileExtension(language) {
 const generateFile = async (language, content) => {
     const jobID = uuid();
     const extension = getFileExtension(language);
+    if (language.toLowerCase() === 'java') {
+        content = content.replace(/public\s+class\s+\w+/, `public class CodeVed_${jobID.replaceAll('-', '_')}`);
+    }
     const filename = `${jobID}.${extension}`;
     const filePath = path.join(dirCodes, filename);
     await fs.promises.writeFile(filePath, content);

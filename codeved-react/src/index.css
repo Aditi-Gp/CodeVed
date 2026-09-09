@@ -62,9 +62,12 @@ a { color: inherit; text-decoration: none; }
 }
 .blinking-cursor {
   animation: blink 1s step-end infinite;
-  margin-left: 6px;
+  margin-left: 7px;
   display: inline-block;
-  font-size: 10px;
+  width: 7px;
+  height: 16px;
+  background: var(--orange);
+  vertical-align: middle;
 }
 .marquee { animation: scroll 25s linear infinite; }
 @media (prefers-reduced-motion: reduce) {

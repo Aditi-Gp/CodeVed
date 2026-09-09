@@ -6,7 +6,7 @@ import { runCode } from "./api.js";
 const snippets = {
   py: [
     ["01", <span className="text-[#77736c] italic"># find it once. remember it.</span>],
-    ["02", <><span className="text-[#ff9d7a]">def</span>{" "}<span className="text-[#d9ff5a]">two_sum</span>(nums, target):</>],
+    ["02", <><span className="text-[#ff9d7a]">def </span>{" "}<span className="text-[#d9ff5a]">two_sum</span>(nums, target):</>],
     ["03", <>{"  "}seen = {"{}"}</>],
     ["04", <>{"  "}<span className="text-[#ff9d7a]">for</span> i, n <span className="text-[#ff9d7a]">in</span>{" "}<span className="text-[#d9ff5a]">enumerate</span>(nums):</>],
     ["05", <>{"    "}<span className="text-[#ff9d7a]">if</span> target - n <span className="text-[#ff9d7a]">in</span> seen:</>],
@@ -262,7 +262,7 @@ function Compiler({lang,setLang,run,running,accepted,currentSnippet}) {
           {currentSnippet.map(([ln,code],i) => (
             <div key={ln} className="animate-code-line flex gap-[18px]" style={{animationDelay:`${i*.08}s`}}>
               <span className="w-[18px] shrink-0 select-none text-right text-[#6d6961]">{ln}</span>
-              <span className="flex items-center whitespace-pre">{code}{i===currentSnippet.length-1 && <span className="blinking-cursor">🟠</span>}</span>
+              <span className="flex items-center whitespace-pre">{code}{i===currentSnippet.length-1 && <span className="blinking-cursor" />}</span>
             </div>
           ))}
         </div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { runCode as executeCode } from "./api.js";
+import { handleCodeKeyDown } from "./editorUtils.js";
 
 const templates = {
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello CodeVed!" << endl;\n    return 0;\n}`,
@@ -28,6 +29,8 @@ function CompilerApp() {
   const markUnsaved = () => {
     if (status !== "Ready") setStatus("Unsaved changes");
   };
+
+  const handleEditorKeyDown = (event) => handleCodeKeyDown(event, code, setCode);
 
   const changeLanguage = (nextLanguage) => {
     setLanguage(nextLanguage);
@@ -99,7 +102,7 @@ function CompilerApp() {
 
         <div className="grid min-h-[500px] gap-6 lg:h-[65vh] lg:grid-cols-[1.4fr_1fr]">
           <Pane title="editor.src" dark note="experiment away!" className="min-h-[400px]">
-            <textarea value={code} onChange={(event) => { setCode(event.target.value); markUnsaved(); }} spellCheck="false" placeholder="Write your code here..." className="h-full min-h-[400px] w-full resize-none border-0 bg-[#1d1c1a] p-5 font-mono text-sm leading-[1.7] text-[#e9e4d8] outline-none selection:bg-[rgba(217,255,90,.2)]" />
+            <textarea value={code} onChange={(event) => { setCode(event.target.value); markUnsaved(); }} onKeyDown={handleEditorKeyDown} spellCheck="false" placeholder="Write your code here..." className="h-full min-h-[400px] w-full resize-none border-0 bg-[#1d1c1a] p-5 font-mono text-sm leading-[1.7] text-[#e9e4d8] outline-none selection:bg-[rgba(217,255,90,.2)]" />
           </Pane>
 
           <div className="grid min-h-[400px] gap-6 lg:grid-rows-[1fr_1.5fr]">
