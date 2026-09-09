@@ -41,6 +41,17 @@ export class CppExecutor extends BaseExecutor {
         { timeout: this.config.compilationTimeout },
         (error, stdout, stderr) => {
           const duration = Date.now() - compileStart;
+          const compilerUnavailable = error?.code === "ENOENT"
+            || stderr.includes("g++' is not recognized")
+            || stderr.includes("g++: command not found");
+
+          if (compilerUnavailable) {
+            const setupMessage = process.platform === "win32"
+              ? "C++ compiler not found. Install MSYS2, add C:\\msys64\\ucrt64\\bin to PATH, then restart the backend."
+              : "C++ compiler not found. Install g++ and make sure it is available on PATH.";
+            logger.compilationError("", "cpp", jobId, new Error(setupMessage), duration);
+            return reject(new Error(setupMessage));
+          }
           
           if (error) {
             logger.compilationError("", "cpp", jobId, 
