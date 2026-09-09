@@ -106,7 +106,7 @@ function EditorApp() {
         </div>
       </main>
 
-      <footer className="border-t border-[var(--line)] bg-[var(--paper)] py-7"><div className="mx-auto flex w-full max-w-[1464px] justify-between gap-4 px-8 font-mono text-[11px] uppercase text-[var(--muted)]"><span>CodeVed Editor v1.0</span><span>Built by <a href="https://www.linkedin.com/in/codeved" target="_blank" rel="noopener" className="font-semibold text-[var(--ink)] underline decoration-[var(--orange)] decoration-2">CodeVed Developer</a></span></div></footer>
+      <footer className="border-t border-[var(--line)] bg-[var(--paper)] py-7"><div className="mx-auto flex w-full max-w-[1464px] flex-wrap justify-between gap-4 px-8 font-mono text-[11px] uppercase text-[var(--muted)]"><span>CodeVed Editor v1.0</span><span>Developed by <a href="https://github.com/Aditi-Gp" target="_blank" rel="noreferrer" className="font-semibold text-[var(--ink)] underline decoration-[var(--orange)] decoration-2">Aditi Gupta</a> · <a href="https://www.linkedin.com/in/aditi-gupta-56429322a/" target="_blank" rel="noreferrer" className="font-semibold text-[var(--ink)] underline decoration-[var(--orange)] decoration-2">LinkedIn</a></span></div></footer>
     </div>
   );
 }

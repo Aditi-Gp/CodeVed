@@ -219,7 +219,7 @@ function App() {
               <p className="mb-8 text-lg text-[var(--muted)]">Begin your session.</p>
               <button className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Start coding free ↗</button>
             </div>
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
               {[
                 ["Product","Compiler","Curriculum","Mentorship","Pricing"],
                 ["Philosophy","The Manifesto","Learning vs Ranking","Engineering Blog"],
@@ -230,11 +230,16 @@ function App() {
                   {links.map(x => <a href="/" key={x} className="mb-4 block text-[15px] text-[var(--muted)] hover:text-[var(--orange)]">{x}</a>)}
                 </div>
               ))}
+              <div>
+                <h4 className="mb-6 font-mono text-xs font-semibold uppercase tracking-[.05em]">Connect</h4>
+                <a href="https://github.com/Aditi-Gp" target="_blank" rel="noreferrer" className="mb-3 flex items-center justify-between border-2 border-[var(--ink)] bg-[var(--acid)] px-3 py-2.5 font-mono text-sm font-semibold text-[var(--ink)] shadow-[3px_3px_0_var(--ink)] transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--orange)] hover:text-[var(--white)] hover:shadow-[5px_5px_0_var(--ink)]">GitHub <span>↗</span></a>
+                <a href="https://www.linkedin.com/in/aditi-gupta-56429322a/" target="_blank" rel="noreferrer" className="flex items-center justify-between border-2 border-[var(--ink)] bg-[var(--white)] px-3 py-2.5 font-mono text-sm font-semibold text-[var(--ink)] shadow-[3px_3px_0_var(--orange)] transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--orange)] hover:text-[var(--white)] hover:shadow-[5px_5px_0_var(--ink)]">LinkedIn <span>↗</span></a>
+              </div>
             </div>
           </div>
           <div className="flex flex-wrap justify-between gap-4 border-t border-[var(--line)] pt-[30px] font-mono text-xs text-[var(--muted)]">
-            <span>© 2024 CodeVed Studio. All rights reserved.</span>
-            <span>Designed for thinkers.</span>
+            <span>© 2026 CodeVed Studio. All rights reserved.</span>
+            <span>Designed for thinkers. Developed by Aditi Gupta.</span>
           </div>
         </div>
       </footer>
