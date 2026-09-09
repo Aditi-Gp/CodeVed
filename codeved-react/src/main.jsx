@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { runCode } from "./api.js";
 
 const snippets = {
   py: [
@@ -34,6 +35,12 @@ const snippets = {
 
 const languages = ["Python","C++","java21","JavaScript","Rust","Go","Kotlin","TypeScript","Swift","Ruby","Scala","PHP","C#","Haskell","Elixir"];
 
+const runnableSnippets = {
+  py: 'print("CodeVed is ready")',
+  cpp: '#include <iostream>\nint main() { std::cout << "CodeVed is ready"; return 0; }',
+  js: 'console.log("CodeVed is ready")',
+};
+
 function App() {
   const [lang, setLang] = useState("py");
   const [running, setRunning] = useState(false);
@@ -45,13 +52,17 @@ function App() {
     setRunning(false);
   }, [lang]);
 
-  const run = () => {
+  const run = async () => {
     setRunning(true);
     setAccepted(false);
-    window.setTimeout(() => {
-      setRunning(false);
+    try {
+      await runCode(lang === "py" ? "python" : lang === "cpp" ? "cpp" : "javascript", runnableSnippets[lang]);
       setAccepted(true);
-    }, 800);
+    } catch {
+      setAccepted(false);
+    } finally {
+      setRunning(false);
+    }
   };
 
   const currentSnippet = snippets[lang];
@@ -65,14 +76,14 @@ function App() {
             CodeVed
           </div>
           <nav className={`${menuOpen ? "flex" : "hidden"} absolute left-0 right-0 top-[72px] flex-col gap-5 border-b border-[var(--line)] bg-[var(--paper)] px-6 py-[22px] text-sm text-[var(--muted)] md:static md:flex md:flex-row md:gap-[30px] md:border-0 md:bg-transparent md:p-0`}>
-            <a href="#">Problems</a>
+            <a href="/problemlist.html">Problems</a>
             <a href="#compiler">Compiler</a>
             <a href="#curriculum">Learn</a>
             <a href="#mentors">Mentors</a>
           </nav>
           <div className="hidden items-center gap-[18px] md:flex">
-            <a href="#" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
-            <button className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)] transition hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--orange)]">Start coding ↗</button>
+            <a href="/login&register.html" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
+            <a href="/compiler.html" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)] transition hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--orange)]">Start coding ↗</a>
           </div>
           <button className="relative z-20 text-2xl md:hidden" onClick={() => setMenuOpen(v => !v)} aria-label="menu">☰</button>
         </div>
@@ -100,7 +111,7 @@ function App() {
                 <div className="mt-6 ml-[10%] inline-block -rotate-1 font-hand text-[18px] text-[var(--orange)]">you can take your time here.</div>
               </div>
               <div className="mt-[34px] flex items-center gap-[22px]">
-                <button className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Start coding free ↗</button>
+                <a href="/compiler.html" className="inline-block bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Start coding free ↗</a>
                 <a className="border-b border-[var(--ink)] pb-[3px] font-mono text-[13px] font-medium" href="#curriculum">SEE HOW LEARNING WORKS ↓</a>
               </div>
             </div>
@@ -216,7 +227,7 @@ function App() {
               ].map(([heading,...links]) => (
                 <div key={heading}>
                   <h4 className="mb-6 font-mono text-xs font-semibold uppercase tracking-[.05em]">{heading}</h4>
-                  {links.map(x => <a href="#" key={x} className="mb-4 block text-[15px] text-[var(--muted)] hover:text-[var(--orange)]">{x}</a>)}
+                  {links.map(x => <a href="/" key={x} className="mb-4 block text-[15px] text-[var(--muted)] hover:text-[var(--orange)]">{x}</a>)}
                 </div>
               ))}
             </div>

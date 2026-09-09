@@ -117,6 +117,9 @@ router.get('/me/dashboard', authenticate, async (req, res) => {
           problemsSolved: progress.totalSolved || 0,
           accuracy: parseFloat(accuracy),
           totalSubmissions: totalSubmissions,
+          streakDays: progress.streak || 0,
+          topicWise: progress.topicWise || {},
+          difficultyWise: progress.difficultyWise || {},
         },
         heatmap: heatmapData, // Pass the aggregated data to the frontend
         recentActivity: formattedSubmissions,

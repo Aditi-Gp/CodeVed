@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { login as loginUser, register as registerUser, saveSession } from "./api.js";
 
 const initialMessages = {
   login: "> initializing session payload...",
@@ -15,10 +16,6 @@ function AuthApp() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
-  const timerRef = useRef();
-
-  useEffect(() => () => window.clearTimeout(timerRef.current), []);
-
   const switchView = (nextView) => {
     setView(nextView);
     setError("");
@@ -36,7 +33,7 @@ function AuthApp() {
     setSuccess("");
   };
 
-  const submitLogin = (event) => {
+  const submitLogin = async (event) => {
     event.preventDefault();
     if (!login.email || !login.password) {
       setError("Syntax Error: Email and Password required.");
@@ -45,18 +42,17 @@ function AuthApp() {
     setSubmitting(true);
     setError("");
     setSuccess("Logging in...");
-    timerRef.current = window.setTimeout(() => {
-      if (login.email === "error@codeved.com") finishWithError("Fatal: Connection refused (Port 8080 down).");
-      else if (login.email === "rate@codeved.com") finishWithError("HTTP 429: Too many requests. Retry in 15s.");
-      else if (login.password !== "password123") finishWithError("Authentication Failed: Invalid credentials.");
-      else {
-        setSuccess("Session Established. Redirecting...");
-        timerRef.current = window.setTimeout(() => { window.location.href = "/dashboard.html"; }, 1000);
-      }
-    }, 1500);
+    try {
+      const response = await loginUser(login);
+      saveSession(response);
+      setSuccess("Session established. Redirecting...");
+      window.location.href = "/dashboard.html";
+    } catch (requestError) {
+      finishWithError(requestError.message);
+    }
   };
 
-  const submitRegister = (event) => {
+  const submitRegister = async (event) => {
     event.preventDefault();
     if (!register.username || !register.email || !register.password) {
       setError("Syntax Error: All fields are required.");
@@ -65,18 +61,14 @@ function AuthApp() {
     setSubmitting(true);
     setError("");
     setSuccess("Registering...");
-    timerRef.current = window.setTimeout(() => {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(register.email)) finishWithError("Validation Error: Invalid email format.");
-      else if (register.username.length < 3 || register.username.length > 20) finishWithError("Validation Error: Username must be 3-20 chars.");
-      else if (register.password.length < 6) finishWithError("Security Alert: Password must be at least 6 chars.");
-      else if (register.email === "taken@codeved.com") finishWithError("Conflict: Email is already registered.");
-      else if (register.email === "rate@codeved.com") finishWithError("HTTP 429: Too many requests. Retry in 15s.");
-      else {
-        setSuccess("User Created Successfully.");
-        timerRef.current = window.setTimeout(() => switchView("login"), 1000);
-      }
-    }, 1500);
+    try {
+      const response = await registerUser(register);
+      saveSession(response);
+      setSuccess("User created successfully. Redirecting...");
+      window.location.href = "/dashboard.html";
+    } catch (requestError) {
+      finishWithError(requestError.message);
+    }
   };
 
   const finishWithError = (messageText) => {

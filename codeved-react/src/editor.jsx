@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { explainCode, runCode as executeCode } from "./api.js";
 
 const templates = {
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Ready to compile. Change the world!" << endl;\n    return 0;\n}`,
@@ -21,10 +22,6 @@ function EditorApp() {
   const [aiMessage, setAiMessage] = useState("");
   const textareaRef = useRef(null);
   const previewRef = useRef(null);
-  const timers = useRef([]);
-
-  useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), []);
-
   const resetOutput = () => {
     setOutput("");
     setError("");
@@ -56,36 +53,33 @@ function EditorApp() {
     });
   };
 
-  const runCode = () => {
+  const runCode = async () => {
     setRunning(true);
     resetOutput();
     setOutput("Compiling and running your code...");
-    const timer = window.setTimeout(() => {
+    try {
+      const response = await executeCode(language, code, input);
+      setOutput(response.output || "");
+      setDuration(`Time: ${response.executionTime ?? "?"}ms`);
+    } catch (requestError) {
+      setOutput("");
+      setError(requestError.message);
+    } finally {
       setRunning(false);
-      if (!code.trim()) {
-        setOutput("");
-        setError("Execution Error: Code cannot be empty.");
-      } else if (code.includes("error")) {
-        setOutput("");
-        setError("Exception: simulated runtime error on line 4.\nCheck syntax and try again.");
-      } else {
-        setOutput(`Ready to compile. Change the world!${input.trim() ? `\n\nReceived Input:\n${input}` : ""}`);
-        setDuration(`Time: ${Math.floor(Math.random() * 80 + 10)}ms`);
-      }
-    }, 1200);
-    timers.current.push(timer);
+    }
   };
 
-  const explainCode = () => {
+  const requestExplanation = async () => {
     setExplaining(true);
     setAiMessage("loading");
-    const timer = window.setTimeout(() => {
+    try {
+      const response = await explainCode(language, code);
+      setAiMessage(response.explanation || "No explanation returned.");
+    } catch (requestError) {
+      setAiMessage(requestError.message);
+    } finally {
       setExplaining(false);
-      if (Math.random() > 0.8) setAiMessage("rate");
-      else if (!code.trim()) setAiMessage("empty");
-      else setAiMessage("success");
-    }, 2000);
-    timers.current.push(timer);
+    }
   };
 
   return (
@@ -93,6 +87,7 @@ function EditorApp() {
       <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--paper)]">
         <div className="mx-auto flex h-[72px] w-full max-w-[1464px] items-center justify-between px-8">
           <a href="/" className="flex items-center gap-[9px] font-serif text-[25px] font-semibold tracking-[-1px]"><span className="grid h-7 w-7 -rotate-1 place-items-center border-[1.5px] border-[var(--ink)] font-mono text-[11px]">&lt;/&gt;</span>CodeVed</a>
+          <nav className="hidden gap-6 text-sm text-[var(--muted)] md:flex"><a href="/problemlist.html">Problems</a><a href="/compiler.html">Compiler</a><a href="/dashboard.html">Dashboard</a><a href="/login&register.html">Sign in</a></nav>
           <button onClick={() => setTheme(theme === "light" ? "dark" : "light")} title="Toggle dark/light mode" className="border border-[var(--ink)] bg-[var(--paper2)] px-3 py-2 text-base shadow-[3px_3px_0_var(--orange)]">{theme === "light" ? "🌙" : "☀️"}</button>
         </div>
       </header>
@@ -101,7 +96,7 @@ function EditorApp() {
         <div className="mb-6 flex flex-wrap items-end justify-between gap-5">
           <div className="flex items-center gap-4">
             <label className="relative"><span className="sr-only">Programming language</span><select value={language} onChange={(event) => changeLanguage(event.target.value)} className="appearance-none border border-[var(--ink)] bg-[var(--paper)] px-4 py-2 pr-8 text-[13px] font-semibold text-[var(--ink)] shadow-[2px_2px_0_var(--line)] outline-none focus:border-[var(--orange)]"><option value="cpp">C++ (GCC)</option><option value="java">Java (JDK 21)</option><option value="python">Python (3.11)</option></select><span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px]">▼</span></label>
-            <button onClick={explainCode} disabled={explaining} className="border border-[var(--ink)] bg-[var(--white)] px-4 py-2 font-sans text-[13px] font-semibold shadow-[3px_3px_0_var(--orange)] disabled:opacity-60">{explaining ? "Analyzing..." : "✨ Explain Code"}</button>
+            <button onClick={requestExplanation} disabled={explaining} className="border border-[var(--ink)] bg-[var(--white)] px-4 py-2 font-sans text-[13px] font-semibold shadow-[3px_3px_0_var(--orange)] disabled:opacity-60">{explaining ? "Analyzing..." : "✨ Explain Code"}</button>
           </div>
           <button onClick={runCode} disabled={running} className="border border-[var(--ink)] bg-[var(--acid)] px-4 py-2 font-sans text-[13px] font-semibold shadow-[3px_3px_0_var(--ink)] disabled:cursor-not-allowed disabled:opacity-60">{running ? "Running..." : "▸ RUN CODE"}</button>
         </div>
@@ -117,7 +112,7 @@ function EditorApp() {
           <div className="grid gap-6">
             <Pane title="STDIN (Optional)"><textarea value={input} onChange={(event) => setInput(event.target.value)} spellCheck="false" placeholder="Enter program inputs here..." className="min-h-[100px] w-full resize-y border-0 bg-[var(--white)] p-4 font-mono text-sm leading-[1.6] text-[var(--ink)] outline-none" /></Pane>
             <Pane title="STDOUT / VERDICT" className="min-h-[190px]"><div className="flex flex-col"><div className={`whitespace-pre-wrap p-4 font-mono text-sm leading-[1.6] ${output ? "text-[var(--ink)]" : "italic text-[var(--muted)]"}`}>{output || "Output will appear here..."}</div>{error && <div className="whitespace-pre-wrap border-l-4 border-t border-[var(--red)] bg-[#ffebe6] p-4 font-mono text-[13px] text-[var(--red)]">{error}</div>}{duration && <div className="flex justify-between border-t border-[var(--line)] bg-[var(--paper)] px-4 py-2 font-mono text-[11px] text-[var(--muted)]"><span>Status: Success</span><span>{duration}</span></div>}</div></Pane>
-            {aiMessage && <Pane title="CodeVed AI // Explanation" className="border-[var(--green)] bg-[#f0f7f4] shadow-[8px_8px_0_var(--green)]"><div className="p-4 text-sm leading-[1.7]">{aiMessage === "loading" ? <span className="italic text-[var(--muted)]">CodeVed AI is reading your code...</span> : aiMessage === "rate" ? <span className="font-mono font-semibold text-[var(--red)]">❌ Error: Rate limit exceeded (HTTP 429). Please try again in 5s.</span> : aiMessage === "empty" ? <span className="font-mono font-semibold text-[var(--red)]">❌ Error: No code provided to explain.</span> : <><strong>Code Overview:</strong><br />This snippet defines the entry point of the application. It utilizes standard output to print a message to the console. The structure indicates a clean, basic setup suitable for algorithmic testing.</>}</div></Pane>}
+            {aiMessage && <Pane title="CodeVed AI // Explanation" className="border-[var(--green)] bg-[#f0f7f4] shadow-[8px_8px_0_var(--green)]"><div className="whitespace-pre-wrap p-4 text-sm leading-[1.7]">{aiMessage === "loading" ? <span className="italic text-[var(--muted)]">CodeVed AI is reading your code...</span> : aiMessage}</div></Pane>}
           </div>
         </div>
       </main>

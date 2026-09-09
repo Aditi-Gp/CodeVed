@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { runCode as executeCode } from "./api.js";
 
 const templates = {
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello CodeVed!" << endl;\n    return 0;\n}`,
@@ -24,8 +25,6 @@ function CompilerApp() {
   const [running, setRunning] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => () => window.clearTimeout(window.compilerRunTimer), []);
-
   const markUnsaved = () => {
     if (status !== "Ready") setStatus("Unsaved changes");
   };
@@ -39,32 +38,23 @@ function CompilerApp() {
     setStatus("Ready");
   };
 
-  const runCode = () => {
+  const runCode = async () => {
     setRunning(true);
     setOutput("Compiling and running your code...");
     setError("");
     setStatus("Executing");
 
-    window.compilerRunTimer = window.setTimeout(() => {
+    try {
+      const response = await executeCode(language, code, input);
+      setOutput(response.output || "");
+      setStatus(`Executed in ${response.executionTime ?? "?"}ms`);
+    } catch (requestError) {
+      setOutput("");
+      setError(requestError.message);
+      setStatus("Runtime Error");
+    } finally {
       setRunning(false);
-
-      if (!code.trim()) {
-        setOutput("");
-        setError("Error: Code execution failed. File is empty.");
-        setStatus("Runtime Error");
-        return;
-      }
-
-      if (code.includes("error")) {
-        setOutput("");
-        setError('Exception in thread "main" java.lang.RuntimeException: Simulated syntax/runtime error encountered.\n    at Main.main(Main.java:4)');
-        setStatus("Failed");
-        return;
-      }
-
-      setOutput(`Hello CodeVed!${input.trim() ? `\n\n[Received Input]:\n${input}` : ""}`);
-      setStatus("Executed in 45ms");
-    }, 1200);
+    }
   };
 
   return (
@@ -76,14 +66,14 @@ function CompilerApp() {
             CodeVed
           </a>
           <nav className={`${menuOpen ? "flex" : "hidden"} absolute left-0 right-0 top-[72px] flex-col gap-5 border-b border-[var(--line)] bg-[var(--paper)] px-8 py-[22px] text-sm text-[var(--muted)] md:static md:flex md:flex-row md:gap-[30px] md:border-0 md:bg-transparent md:p-0`}>
-            <a href="#">Problems</a>
+            <a href="/problemlist.html">Problems</a>
             <a href="/compiler.html" className="font-semibold text-[var(--ink)]">Compiler</a>
-            <a href="#">Learn</a>
-            <a href="#">Mentors</a>
+            <a href="/">Learn</a>
+            <a href="/">Mentors</a>
           </nav>
           <div className="hidden items-center gap-[18px] md:flex">
-            <a href="#" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
-            <a href="/" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Dashboard ↗</a>
+            <a href="/login&register.html" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
+            <a href="/dashboard.html" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Dashboard ↗</a>
           </div>
           <button className="relative z-20 text-2xl md:hidden" onClick={() => setMenuOpen((value) => !value)} aria-label="menu">☰</button>
         </div>
