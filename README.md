@@ -6,7 +6,7 @@ A modern, web-based multi language support (C++, Python Java) compiler and code 
 
 
 
-## Features
+## Feature
 
 - **Real-time Code Editor**: Monaco-style code editor with C++ syntax highlighting
 - **Instant Compilation**: Compile and execute C++/Python/Java code with a single click
