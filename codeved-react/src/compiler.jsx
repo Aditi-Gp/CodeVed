@@ -69,8 +69,8 @@ function CompilerApp() {
             CodeVed
           </a>
           <nav className={`${menuOpen ? "flex" : "hidden"} absolute left-0 right-0 top-[72px] flex-col gap-5 border-b border-[var(--line)] bg-[var(--paper)] px-8 py-[22px] text-sm text-[var(--muted)] md:static md:flex md:flex-row md:gap-[30px] md:border-0 md:bg-transparent md:p-0`}>
-            <a href="/problemlist.html">Problems</a>
-            <a href="/compiler.html" className="font-semibold text-[var(--ink)]">Compiler</a>
+            <a href="/problemlist">Problems</a>
+            <a href="/compiler" className="font-semibold text-[var(--ink)]">Compiler</a>
             <a href="/">Learn</a>
             <a href="/">Mentors</a>
           </nav>
