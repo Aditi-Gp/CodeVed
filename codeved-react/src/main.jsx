@@ -76,14 +76,14 @@ function App() {
             CodeVed
           </div>
           <nav className={`${menuOpen ? "flex" : "hidden"} absolute left-0 right-0 top-[72px] flex-col gap-5 border-b border-[var(--line)] bg-[var(--paper)] px-6 py-[22px] text-sm text-[var(--muted)] md:static md:flex md:flex-row md:gap-[30px] md:border-0 md:bg-transparent md:p-0`}>
-            <a href="/problemlist.html">Problems</a>
-            <a href="#compiler">Compiler</a>
+            <a href="/problemlist">Problems</a>
+            <a href="/compiler">Compiler</a>
             <a href="#curriculum">Learn</a>
             <a href="#mentors">Mentors</a>
           </nav>
           <div className="hidden items-center gap-[18px] md:flex">
-            <a href="/login&register.html" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
-            <a href="/compiler.html" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)] transition hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--orange)]">Start coding ↗</a>
+            <a href="/login&register" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
+            <a href="/compiler" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)] transition hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--orange)]">Start coding ↗</a>
           </div>
           <button className="relative z-20 text-2xl md:hidden" onClick={() => setMenuOpen(v => !v)} aria-label="menu">☰</button>
         </div>
@@ -111,7 +111,7 @@ function App() {
                 <div className="mt-6 ml-[10%] inline-block -rotate-1 font-hand text-[18px] text-[var(--orange)]">you can take your time here.</div>
               </div>
               <div className="mt-[34px] flex items-center gap-[22px]">
-                <a href="/compiler.html" className="inline-block bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Start coding free ↗</a>
+                <a href="/compiler" className="inline-block bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Start coding free ↗</a>
                 <a className="border-b border-[var(--ink)] pb-[3px] font-mono text-[13px] font-medium" href="#curriculum">SEE HOW LEARNING WORKS ↓</a>
               </div>
             </div>
@@ -238,7 +238,7 @@ function App() {
             </div>
           </div>
           <div className="flex flex-wrap justify-between gap-4 border-t border-[var(--line)] pt-[30px] font-mono text-xs text-[var(--muted)]">
-            <span>© 2026 CodeVed Studio. All rights reserved.</span>
+            <span>© 2026 CodeVed Studio. All rights reserved · MIT License.</span>
             <span>Designed for thinkers. Developed by Aditi Gupta.</span>
           </div>
         </div>

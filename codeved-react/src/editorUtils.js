@@ -1,9 +1,25 @@
 const pairs = { "{": "}", "[": "]", "(": ")", '"': '"', "'": "'" };
 
-export function handleCodeKeyDown(event, code, setCode) {
+export function handleCodeKeyDown(event, code, setCode, language = "") {
   const input = event.currentTarget;
   const start = input.selectionStart;
   const end = input.selectionEnd;
+
+  if (language === "cpp" && event.ctrlKey && event.key === "\\") {
+    event.preventDefault();
+    const lineStart = code.lastIndexOf("\n", start - 1) + 1;
+    const selectionEnd = end === start ? code.indexOf("\n", start) : end;
+    const blockEnd = selectionEnd === -1 ? code.length : selectionEnd;
+    const lines = code.slice(lineStart, blockEnd).split("\n");
+    const uncomment = lines.every((line) => /^\s*\/\//.test(line) || !line.trim());
+    const nextLines = lines.map((line) => {
+      if (uncomment) return line.replace(/^(\s*)\/\/\s?/, "$1");
+      return line.trim() ? line.replace(/^(\s*)/, "$1// ") : line;
+    });
+    const replacement = nextLines.join("\n");
+    setCode(`${code.slice(0, lineStart)}${replacement}${code.slice(blockEnd)}`);
+    return;
+  }
 
   if (event.key === "Tab") {
     event.preventDefault();

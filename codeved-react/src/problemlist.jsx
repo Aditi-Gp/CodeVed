@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { getProblems } from "./api.js";
+import Footer from "./Footer.jsx";
 
 function ProblemListApp() {
   const [view, setView] = useState("loading");
@@ -30,14 +31,14 @@ function ProblemListApp() {
             CodeVed
           </a>
           <nav className={`${menuOpen ? "flex" : "hidden"} absolute left-0 right-0 top-[72px] flex-col gap-5 border-b border-[var(--line)] bg-[var(--paper)] px-6 py-[22px] text-sm text-[var(--muted)] md:static md:flex md:flex-row md:gap-[30px] md:border-0 md:bg-transparent md:p-0`}>
-            <a href="/problemlist.html" className="font-semibold text-[var(--ink)]">Problems</a>
-            <a href="/compiler.html">Compiler</a>
+            <a href="/problemlist" className="font-semibold text-[var(--ink)]">Problems</a>
+            <a href="/compiler">Compiler</a>
             <a href="/">Learn</a>
             <a href="/">Mentors</a>
           </nav>
           <div className="hidden items-center gap-[18px] md:flex">
-            <a href="/login&register.html" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
-            <a href="/dashboard.html" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Dashboard ↗</a>
+            <a href="/login&register" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
+            <a href="/dashboard" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Dashboard ↗</a>
           </div>
           <button className="relative z-20 text-2xl md:hidden" onClick={() => setMenuOpen((open) => !open)} aria-label="menu">☰</button>
         </div>
@@ -54,12 +55,7 @@ function ProblemListApp() {
         {view === "data" && <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-8 max-[800px]:grid-cols-1">{problems.map((problem) => <ProblemCard key={problem.id} problem={problem} />)}</div>}
       </main>
 
-      <footer className="border-t border-[var(--line)] bg-[var(--paper)] py-7">
-        <div className="mx-auto flex w-full max-w-[1264px] flex-wrap justify-between gap-4 px-8 font-mono text-[11px] uppercase text-[var(--muted)]">
-          <span>© 2024 CodeVed Studio / built for the long game</span>
-          <span>NO ADS · NO PUBLIC SHAMING · JUST PRACTICE</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
@@ -76,7 +72,7 @@ function ProblemCard({ problem }) {
       <div className="mb-4 flex items-start justify-between"><span className={`border border-[var(--ink)] px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[.05em] ${difficulty.className}`}>{difficulty.label}</span></div>
       <h2 className="mb-3 font-sans text-[22px] font-semibold leading-tight">{problem.name || "Untitled Problem"}</h2>
       <p className={`mb-8 flex-1 font-mono text-sm leading-[1.6] text-[var(--muted)] ${problem.statement ? "" : "italic opacity-70"}`}>{description}</p>
-      <div className="flex justify-end border-t border-[var(--line)] pt-5"><a href={`/problemdetails.html?id=${encodeURIComponent(problem._id || problem.id || "")}`} className="font-mono text-[13px] font-semibold uppercase hover:text-[var(--orange)]">View &amp; Solve ↗</a></div>
+      <div className="flex justify-end border-t border-[var(--line)] pt-5"><a href={`/problemdetails?id=${encodeURIComponent(problem._id || problem.id || "")}`} className="font-mono text-[13px] font-semibold uppercase hover:text-[var(--orange)]">View &amp; Solve ↗</a></div>
     </article>
   );
 }

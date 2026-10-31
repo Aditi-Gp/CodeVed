@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { clearSession, getDashboard, getToken, verifyToken } from "./api.js";
+import Footer from "./Footer.jsx";
 
 function DashboardApp() {
   const [view, setView] = useState("verifying");
@@ -39,16 +40,17 @@ function DashboardApp() {
             CodeVed
           </a>
           <nav className="hidden gap-10 text-sm font-semibold uppercase text-[var(--muted)] md:flex">
-            <a href="/problemlist.html">Curriculum</a>
-            <a href="/compiler.html">Sandbox</a>
+            <a href="/problemlist">Curriculum</a>
+            <a href="/compiler">Sandbox</a>
           </nav>
-          <button onClick={() => { clearSession(); window.location.href = "/login&register.html"; }} className="border-2 border-[var(--ink)] bg-[var(--acid)] px-3 py-1.5 font-mono text-[13px] font-semibold shadow-[4px_4px_0_var(--ink)]">LOG OUT</button>
+          <button onClick={() => { clearSession(); window.location.href = "/login&register"; }} className="border-2 border-[var(--ink)] bg-[var(--acid)] px-3 py-1.5 font-mono text-[13px] font-semibold shadow-[4px_4px_0_var(--ink)]">LOG OUT</button>
         </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-[1404px] flex-1 flex-col px-8 pb-[120px] pt-[60px]">
         {view !== "data" ? <StateView view={view} /> : <DashboardData data={data} />}
       </main>
+      <Footer />
 
     </div>
   );
@@ -69,7 +71,7 @@ function StateView({ view }) {
       <span className="absolute left-6 top-[-14px] bg-[var(--ink)] px-2 py-0.5 font-mono text-xs font-semibold text-[var(--acid)]">SYSTEM MSG</span>
       {icon ? <div className="mb-6 text-[56px]">{icon}</div> : <div className="mb-8 h-[60px] w-[60px] animate-spin rounded-full border-[6px] border-[var(--paper2)] border-t-[var(--orange)]" />}
       <div className={`font-mono text-xl font-semibold uppercase tracking-[.1em] ${isError ? "mb-6 text-[var(--red)]" : ""}`}>{title}</div>
-      {view === "authFailed" && <button onClick={() => { window.location.href = "/login&register.html"; }} className="mt-6 border-2 border-[var(--ink)] bg-[var(--white)] px-6 py-3 font-mono text-sm font-semibold uppercase shadow-[3px_3px_0_var(--ink)]">Return to Login</button>}
+      {view === "authFailed" && <button onClick={() => { window.location.href = "/login&register"; }} className="mt-6 border-2 border-[var(--ink)] bg-[var(--white)] px-6 py-3 font-mono text-sm font-semibold uppercase shadow-[3px_3px_0_var(--ink)]">Return to Login</button>}
       {view === "error" && <button onClick={() => window.location.reload()} className="mt-6 border-2 border-[var(--ink)] bg-[var(--white)] px-3 py-1.5 font-mono text-[11px] font-semibold uppercase shadow-[3px_3px_0_var(--ink)]">Retry Connection</button>}
       {view === "empty" && <div className="mt-6 font-hand text-2xl text-[var(--orange)]">write some code!</div>}
     </section>

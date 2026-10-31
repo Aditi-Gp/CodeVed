@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { runCode as executeCode } from "./api.js";
 import { handleCodeKeyDown } from "./editorUtils.js";
+import Footer from "./Footer.jsx";
 
 const templates = {
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello CodeVed!" << endl;\n    return 0;\n}`,
@@ -30,7 +31,7 @@ function CompilerApp() {
     if (status !== "Ready") setStatus("Unsaved changes");
   };
 
-  const handleEditorKeyDown = (event) => handleCodeKeyDown(event, code, setCode);
+  const handleEditorKeyDown = (event) => handleCodeKeyDown(event, code, setCode, language);
 
   const changeLanguage = (nextLanguage) => {
     setLanguage(nextLanguage);
@@ -42,6 +43,7 @@ function CompilerApp() {
   };
 
   const runCode = async () => {
+    if (running) return;
     setRunning(true);
     setOutput("Compiling and running your code...");
     setError("");
@@ -69,14 +71,14 @@ function CompilerApp() {
             CodeVed
           </a>
           <nav className={`${menuOpen ? "flex" : "hidden"} absolute left-0 right-0 top-[72px] flex-col gap-5 border-b border-[var(--line)] bg-[var(--paper)] px-8 py-[22px] text-sm text-[var(--muted)] md:static md:flex md:flex-row md:gap-[30px] md:border-0 md:bg-transparent md:p-0`}>
-            <a href="/problemlist.html">Problems</a>
-            <a href="/compiler.html" className="font-semibold text-[var(--ink)]">Compiler</a>
+            <a href="/problemlist">Problems</a>
+            <a href="/compiler" className="font-semibold text-[var(--ink)]">Compiler</a>
             <a href="/">Learn</a>
             <a href="/">Mentors</a>
           </nav>
           <div className="hidden items-center gap-[18px] md:flex">
-            <a href="/login&register.html" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
-            <a href="/dashboard.html" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Dashboard ↗</a>
+            <a href="/login&register" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">Sign in</a>
+            <a href="/dashboard" className="bg-[var(--ink)] px-[17px] py-3 text-[13px] font-semibold text-[var(--paper)] shadow-[4px_4px_0_var(--orange)]">Dashboard ↗</a>
           </div>
           <button className="relative z-20 text-2xl md:hidden" onClick={() => setMenuOpen((value) => !value)} aria-label="menu">☰</button>
         </div>
@@ -96,7 +98,7 @@ function CompilerApp() {
               </select>
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px]">▼</span>
             </label>
-            <button onClick={runCode} disabled={running} className="border border-[var(--ink)] bg-[var(--acid)] px-[17px] py-3 text-[13px] font-semibold text-[var(--ink)] shadow-[4px_4px_0_var(--ink)] transition hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--ink)] disabled:cursor-not-allowed disabled:opacity-60">{running ? "Running..." : "▸ RUN CODE"}</button>
+            <button type="button" onClick={runCode} disabled={running} className="border border-[var(--ink)] bg-[var(--acid)] px-[17px] py-3 text-[13px] font-semibold text-[var(--ink)] shadow-[4px_4px_0_var(--ink)] transition hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_var(--ink)] disabled:cursor-not-allowed disabled:opacity-60">{running ? "Running..." : "▸ RUN CODE"}</button>
           </div>
         </div>
 
@@ -123,12 +125,7 @@ function CompilerApp() {
         </div>
       </main>
 
-      <footer className="border-t border-[var(--line)] bg-[var(--paper)] py-7">
-        <div className="mx-auto flex w-full max-w-[1464px] flex-wrap justify-between gap-4 px-8 font-mono text-[11px] uppercase text-[var(--muted)]">
-          <span>© 2024 CodeVed Studio / built for the long game</span>
-          <span>NO ADS · NO PUBLIC SHAMING · JUST PRACTICE</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

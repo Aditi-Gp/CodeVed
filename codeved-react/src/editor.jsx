@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { explainCode, runCode as executeCode } from "./api.js";
 import { handleCodeKeyDown } from "./editorUtils.js";
+import Footer from "./Footer.jsx";
 
 const templates = {
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Ready to compile. Change the world!" << endl;\n    return 0;\n}`,
@@ -43,6 +44,7 @@ function EditorApp() {
   };
 
   const runCode = async () => {
+    if (running) return;
     setRunning(true);
     resetOutput();
     setOutput("Compiling and running your code...");
@@ -76,7 +78,7 @@ function EditorApp() {
       <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--paper)]">
         <div className="mx-auto flex h-[72px] w-full max-w-[1464px] items-center justify-between px-8">
           <a href="/" className="flex items-center gap-[9px] font-serif text-[25px] font-semibold tracking-[-1px]"><span className="grid h-7 w-7 -rotate-1 place-items-center border-[1.5px] border-[var(--ink)] font-mono text-[11px]">&lt;/&gt;</span>CodeVed</a>
-          <nav className="hidden gap-6 text-sm text-[var(--muted)] md:flex"><a href="/problemlist.html">Problems</a><a href="/compiler.html">Compiler</a><a href="/dashboard.html">Dashboard</a><a href="/login&register.html">Sign in</a></nav>
+          <nav className="hidden gap-6 text-sm text-[var(--muted)] md:flex"><a href="/problemlist">Problems</a><a href="/compiler">Compiler</a><a href="/dashboard">Dashboard</a><a href="/login&register">Sign in</a></nav>
           <button onClick={() => setTheme(theme === "light" ? "dark" : "light")} title="Toggle dark/light mode" className="border border-[var(--ink)] bg-[var(--paper2)] px-3 py-2 text-base shadow-[3px_3px_0_var(--orange)]">{theme === "light" ? "🌙" : "☀️"}</button>
         </div>
       </header>
@@ -94,7 +96,7 @@ function EditorApp() {
           <Pane title="workspace.src" suffix="EDITOR" className="bg-[var(--white)]">
             <div className="relative h-[390px] min-h-[350px] overflow-hidden font-mono text-sm leading-[1.6]">
               <pre ref={previewRef} aria-hidden="true" className="pointer-events-none absolute inset-0 m-0 overflow-auto whitespace-pre bg-[var(--white)] p-5 text-[var(--ink)]">{highlightCode(code, language)}</pre>
-              <textarea ref={textareaRef} value={code} onChange={(event) => setCode(event.target.value)} onScroll={syncScroll} onKeyDown={(event) => handleCodeKeyDown(event, code, setCode)} spellCheck="false" autoCapitalize="off" autoComplete="off" className="absolute inset-0 z-[1] h-full w-full resize-none overflow-auto whitespace-pre bg-transparent p-5 font-mono text-sm leading-[1.6] text-transparent caret-[var(--ink)] outline-none selection:bg-[rgba(217,255,90,.35)]" />
+              <textarea ref={textareaRef} value={code} onChange={(event) => setCode(event.target.value)} onScroll={syncScroll} onKeyDown={(event) => handleCodeKeyDown(event, code, setCode, language)} spellCheck="false" autoCapitalize="off" autoComplete="off" className="absolute inset-0 z-[1] h-full w-full resize-none overflow-auto whitespace-pre bg-transparent p-5 font-mono text-sm leading-[1.6] text-transparent caret-[var(--ink)] outline-none selection:bg-[rgba(217,255,90,.35)]" />
             </div>
           </Pane>
 
@@ -106,7 +108,7 @@ function EditorApp() {
         </div>
       </main>
 
-      <footer className="border-t border-[var(--line)] bg-[var(--paper)] py-7"><div className="mx-auto flex w-full max-w-[1464px] flex-wrap justify-between gap-4 px-8 font-mono text-[11px] uppercase text-[var(--muted)]"><span>CodeVed Editor v1.0</span><span>Developed by <a href="https://github.com/Aditi-Gp" target="_blank" rel="noreferrer" className="font-semibold text-[var(--ink)] underline decoration-[var(--orange)] decoration-2">Aditi Gupta</a> · <a href="https://www.linkedin.com/in/aditi-gupta-56429322a/" target="_blank" rel="noreferrer" className="font-semibold text-[var(--ink)] underline decoration-[var(--orange)] decoration-2">LinkedIn</a></span></div></footer>
+      <Footer />
     </div>
   );
 }
@@ -117,7 +119,13 @@ function Pane({ title, suffix, className = "", children }) {
 
 function highlightCode(code, language) {
   const keywordPattern = language === "python" ? /\b(def|return|if|else|in|class|import|from|for|as)\b/ : /\b(class|public|private|static|void|int|return|new|using|namespace|include)\b/;
-  return code.split("\n").map((line, index) => <React.Fragment key={index}>{line.split(keywordPattern).map((part, partIndex) => partIndex % 2 === 1 ? <span key={partIndex} className="text-[var(--red)]">{part}</span> : <span key={partIndex}>{part}</span>)}{index < code.split("\n").length - 1 ? "\n" : ""}</React.Fragment>);
+  const commentMarker = language === "python" ? "#" : "//";
+  return code.split("\n").map((line, index) => {
+    const commentIndex = line.indexOf(commentMarker);
+    const source = commentIndex >= 0 ? line.slice(0, commentIndex) : line;
+    const comment = commentIndex >= 0 ? line.slice(commentIndex) : "";
+    return <React.Fragment key={index}>{source.split(keywordPattern).map((part, partIndex) => partIndex % 2 === 1 ? <span key={partIndex} className="text-[var(--red)]">{part}</span> : <span key={partIndex}>{part}</span>)}{comment && <span className="text-[#76a889]">{comment}</span>}{index < code.split("\n").length - 1 ? "\n" : ""}</React.Fragment>;
+  });
 }
 
 createRoot(document.getElementById("root")).render(<EditorApp />);

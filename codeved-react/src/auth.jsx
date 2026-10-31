@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { login as loginUser, register as registerUser, saveSession } from "./api.js";
+import Footer from "./Footer.jsx";
 
 const initialMessages = {
   login: "> initializing session payload...",
@@ -46,7 +47,7 @@ function AuthApp() {
       const response = await loginUser(login);
       saveSession(response);
       setSuccess("Session established. Redirecting...");
-      window.location.href = "/dashboard.html";
+      window.location.href = "/dashboard";
     } catch (requestError) {
       finishWithError(requestError.message);
     }
@@ -65,7 +66,7 @@ function AuthApp() {
       const response = await registerUser(register);
       saveSession(response);
       setSuccess("User created successfully. Redirecting...");
-      window.location.href = "/dashboard.html";
+      window.location.href = "/dashboard";
     } catch (requestError) {
       finishWithError(requestError.message);
     }
@@ -93,7 +94,7 @@ function AuthApp() {
         </div>
       </section>
 
-      <section className="relative z-10 flex flex-1 items-center justify-center bg-[var(--paper)] px-6 py-[60px] lg:px-10 lg:py-10">
+      <section className="relative z-10 flex flex-1 flex-col items-center justify-center bg-[var(--paper)] px-6 py-[60px] lg:px-10 lg:py-10">
         <div className="relative flex w-full max-w-[440px] flex-col border-2 border-[var(--ink)] bg-[var(--white)] shadow-[12px_12px_0_var(--orange)] max-[900px]:shadow-[8px_8px_0_var(--orange)]">
           <div className={`absolute right-[-20px] top-[-35px] rotate-2 font-hand text-xl ${view === "login" ? "text-[var(--green)]" : "text-[var(--orange)]"}`}>{view === "login" ? "welcome back." : "join the flow."}</div>
           <div className="flex border-b-2 border-[var(--ink)] bg-[var(--paper2)] font-mono text-xs font-semibold uppercase">
@@ -111,6 +112,7 @@ function AuthApp() {
             </form>
           </div>
         </div>
+        <Footer className="mt-10 w-full" />
       </section>
     </div>
   );
