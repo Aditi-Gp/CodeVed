@@ -39,8 +39,8 @@ function DashboardApp() {
             CodeVed
           </a>
           <nav className="hidden gap-10 text-sm font-semibold uppercase text-[var(--muted)] md:flex">
-            <a href="/problemlist.html">Curriculum</a>
-            <a href="/compiler.html">Sandbox</a>
+            <a href="/problemlist">Curriculum</a>
+            <a href="/compiler">Sandbox</a>
           </nav>
           <button onClick={() => { clearSession(); window.location.href = "/login&register.html"; }} className="border-2 border-[var(--ink)] bg-[var(--acid)] px-3 py-1.5 font-mono text-[13px] font-semibold shadow-[4px_4px_0_var(--ink)]">LOG OUT</button>
         </div>
