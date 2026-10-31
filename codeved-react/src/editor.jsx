@@ -76,7 +76,7 @@ function EditorApp() {
       <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--paper)]">
         <div className="mx-auto flex h-[72px] w-full max-w-[1464px] items-center justify-between px-8">
           <a href="/" className="flex items-center gap-[9px] font-serif text-[25px] font-semibold tracking-[-1px]"><span className="grid h-7 w-7 -rotate-1 place-items-center border-[1.5px] border-[var(--ink)] font-mono text-[11px]">&lt;/&gt;</span>CodeVed</a>
-          <nav className="hidden gap-6 text-sm text-[var(--muted)] md:flex"><a href="/problemlist.html">Problems</a><a href="/compiler.html">Compiler</a><a href="/dashboard.html">Dashboard</a><a href="/login&register.html">Sign in</a></nav>
+          <nav className="hidden gap-6 text-sm text-[var(--muted)] md:flex"><a href="/problemlist">Problems</a><a href="/compiler">Compiler</a><a href="/dashboard">Dashboard</a><a href="/login&register">Sign in</a></nav>
           <button onClick={() => setTheme(theme === "light" ? "dark" : "light")} title="Toggle dark/light mode" className="border border-[var(--ink)] bg-[var(--paper2)] px-3 py-2 text-base shadow-[3px_3px_0_var(--orange)]">{theme === "light" ? "🌙" : "☀️"}</button>
         </div>
       </header>
