@@ -2,10 +2,11 @@
 
 A modern, web-based multi language support (C++, Python Java) compiler and code execution platform built with React and Node.js. This application allows users to write, compile, and execute code directly in their browser with real-time syntax highlighting and user input support.
 
-![CodeVed Online Judge](Screenshot%20from%202025-07-26%2014-24-35.png)
+<img width="1904" height="820" alt="image" src="https://github.com/user-attachments/assets/ea3d6990-e610-4de8-af2f-0bb82a88a6f4" />
 
 
-## Features
+
+## Feature
 
 - **Real-time Code Editor**: Monaco-style code editor with C++ syntax highlighting
 - **Instant Compilation**: Compile and execute C++/Python/Java code with a single click
